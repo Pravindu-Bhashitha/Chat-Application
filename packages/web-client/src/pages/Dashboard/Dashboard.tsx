@@ -8,6 +8,7 @@ import { useSocket } from '../../context/SocketContext';
 import { Message } from '../../types';
 import UserList from '../../components/UserList/UserList';
 import ChatArea from '../../components/ChatArea/ChatArea';
+import { messageService } from '../../api/messageService/messageService';
 
 interface User {
   id: string;
@@ -75,6 +76,24 @@ const Dashboard = () => {
       socket.off('receive_message', handleReceiveMessage);
     };
   }, [socket]);
+
+  useEffect(() => {
+    if (!selectedUser) return;
+
+    const fetchChatHistory = async () => {
+      try {
+        const response = await messageService.getConversation(selectedUser.id);
+
+        if (response) {
+          setMessages(response);
+        }
+      } catch (err) {
+        console.error('Failed to load message history:', err);
+      }
+    };
+
+    fetchChatHistory();
+  }, [selectedUser]);
 
   // Send Message Handler
   const handleSendMessage = (e: React.FormEvent) => {
