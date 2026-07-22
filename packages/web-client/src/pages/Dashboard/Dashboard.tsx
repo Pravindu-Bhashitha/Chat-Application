@@ -1,7 +1,10 @@
 import { useState, useEffect } from 'react';
-import { Container, Navbar, Card, ListGroup, Button, Badge, Spinner, Alert } from 'react-bootstrap';
+import { Container, Card, ListGroup, Badge, Spinner, Alert } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import Header from '../../components/Header.tsx/Header';
+import UserCard from '../../components/UserCard';
+import Footer from '../../components/Footer/Footer';
 
 interface User {
   id: string;
@@ -18,7 +21,6 @@ const Dashboard = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // 1. Get stored auth state
     const token = localStorage.getItem('token');
     const savedUser = localStorage.getItem('user');
 
@@ -29,13 +31,10 @@ const Dashboard = () => {
 
     setCurrentUser(JSON.parse(savedUser));
 
-    // 2. Fetch all users from Auth Service
     const fetchUsers = async () => {
       try {
         const response = await axios.get('http://localhost:4001/api/auth/users', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         });
         setUsers(response.data);
       } catch (err: any) {
@@ -55,26 +54,9 @@ const Dashboard = () => {
   };
 
   return (
-    <div style={{ backgroundColor: '#eef2f7', minHeight: '100vh' }}>
-      {/* Top Navigation Bar */}
-      <Navbar bg="white" className="shadow-sm px-4 justify-content-between mb-4">
-        <Navbar.Brand className="fw-bold fs-4" style={{ color: '#0284c7' }}>
-          💬 Chat App
-        </Navbar.Brand>
-        <div className="d-flex align-items-center gap-3">
-          {currentUser && (
-            <span className="text-muted">
-              Logged in as <strong style={{ color: '#0284c7' }}>{currentUser.username}</strong>
-            </span>
-          )}
-          <Button variant="outline-danger" size="sm" onClick={handleLogout}>
-            Logout
-          </Button>
-        </div>
-      </Navbar>
-
-      {/* Main Dashboard Content */}
-      <Container style={{ maxWidth: '800px' }}>
+    <div className="d-flex flex-column" style={{ backgroundColor: '#eef2f7', minHeight: '100vh' }}>
+      <Header username={currentUser?.username} onLogout={handleLogout} />
+      <Container style={{ maxWidth: '800px' }} className="my-auto">
         <Card className="auth-card p-3 mb-4">
           <Card.Body>
             <div className="d-flex justify-content-between align-items-center mb-3">
@@ -101,26 +83,19 @@ const Dashboard = () => {
             ) : (
               <ListGroup variant="flush" className="border rounded-3 overflow-hidden">
                 {users.map((user) => (
-                  <ListGroup.Item
+                  <UserCard
                     key={user.id}
-                    className="d-flex justify-content-between align-items-center py-3 px-4"
-                  >
-                    <div>
-                      <div className="fw-bold text-dark">{user.username}</div>
-                      <div className="text-muted small">{user.email}</div>
-                    </div>
-                    {currentUser?.id === user.id && (
-                      <Badge bg="success" pill>
-                        You
-                      </Badge>
-                    )}
-                  </ListGroup.Item>
+                    username={user.username}
+                    email={user.email}
+                    isCurrentUser={currentUser?.id === user.id}
+                  />
                 ))}
               </ListGroup>
             )}
           </Card.Body>
         </Card>
       </Container>
+      <Footer />
     </div>
   );
 };
