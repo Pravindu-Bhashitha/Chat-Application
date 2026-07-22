@@ -22,14 +22,17 @@ export const register = async (req: Request, res: Response) => {
 export const login = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
+    console.log('Login request received:', { email, password });
 
     if (!email || !password) {
       return res.status(400).json({ error: 'Email and password are required' });
     }
 
     const authData = await AuthService.loginUser({ email, password });
+
     return res.json(authData);
   } catch (err: any) {
+    console.error('Login error:', err);
     if (err.message === 'INVALID_CREDENTIALS') {
       return res.status(401).json({ error: 'Invalid credentials' });
     }

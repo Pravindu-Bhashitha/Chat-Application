@@ -7,7 +7,6 @@ const prisma = new PrismaClient();
 export class AuthService {
   static async registerUser(data: { username: string; email: string; password: string }) {
     const existingUser = await prisma.user.findUnique({ where: { email: data.email } });
-    console.log('Existing user:', existingUser); // Debugging line to check if the user exists
     if (existingUser) {
       throw new Error('USER_EXISTS');
     }
