@@ -3,6 +3,7 @@ import { Server } from 'socket.io';
 import handlePresenceEvents from './presenceHandler';
 import socketAuthMiddleware from '../middleware/socketAuth.middleware';
 import dotenv from 'dotenv';
+import handleMessageEvents from './messageHandler';
 
 dotenv.config();
 
@@ -20,7 +21,11 @@ const initSocketServer = (server: http.Server): Server => {
 
   // Attach connection handlers
   io.on('connection', (socket) => {
+    const userId = socket.data.user.id;
+    // Join a room named with the user's ID for direct messaging
+    socket.join(userId);
     handlePresenceEvents(io, socket);
+    handleMessageEvents(io, socket);
     // Future handlers (e.g., handleMessageEvents) will go here!
   });
 

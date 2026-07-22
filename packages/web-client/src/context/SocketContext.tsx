@@ -57,7 +57,7 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     newSocket.on('user_offline', ({ onlineUsers }: { onlineUsers: string[] }) => {
       setOnlineUserIds(onlineUsers);
     });
-
+    
     setSocket(newSocket);
 
     // Cleanup connection on unmount / logout
