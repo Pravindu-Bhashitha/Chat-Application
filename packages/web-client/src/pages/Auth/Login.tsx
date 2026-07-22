@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Card, Form, Button, Alert, Container, Spinner } from 'react-bootstrap';
-import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
+import { authService } from '../../api/authService/authService';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -17,12 +17,7 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:4001/api/auth/login', {
-        email,
-        password,
-      });
-
-      const { token, user } = response.data;
+      const { token, user } = await authService.login({ email, password });
       localStorage.setItem('token', token);
       localStorage.setItem('user', JSON.stringify(user));
 

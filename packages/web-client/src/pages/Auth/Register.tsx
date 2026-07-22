@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Card, Form, Button, Alert, Container, Spinner } from 'react-bootstrap';
-import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
+import { authService } from '../../api/authService/authService';
 
 const Register = () => {
     const navigate = useNavigate();
@@ -19,11 +19,7 @@ const Register = () => {
         setLoading(true);
 
         try {
-            await axios.post('http://localhost:4001/api/auth/register', {
-                username,
-                email,
-                password,
-            });
+            await authService.register({ username, email, password });
 
             setSuccess(true);
             setTimeout(() => {

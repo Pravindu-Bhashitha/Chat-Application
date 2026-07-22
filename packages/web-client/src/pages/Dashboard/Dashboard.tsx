@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Container, Card, ListGroup, Badge, Spinner, Alert } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import Header from '../../components/Header.tsx/Header';
 import UserCard from '../../components/UserCard';
 import Footer from '../../components/Footer/Footer';
+import { authService } from '../../api/authService/authService';
 
 interface User {
   id: string;
@@ -33,10 +33,8 @@ const Dashboard = () => {
 
     const fetchUsers = async () => {
       try {
-        const response = await axios.get('http://localhost:4001/api/auth/users', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setUsers(response.data);
+        const data = await authService.getUsers();
+        setUsers(data);
       } catch (err: any) {
         setError('Failed to load user directory.');
       } finally {
