@@ -89,7 +89,8 @@ const Dashboard = () => {
                     key={user.id}
                     username={user.username}
                     email={user.email}
-                    isCurrentUser={(currentUser?.id || (currentUser as any)?.userId) === user.id}
+                    // isCurrentUser={(currentUser?.id || (currentUser as any)?.userId) === user.id}
+                    isCurrentUser={(currentUser?.id === user.id)}
                     isOnline={onlineUserIds.includes(user.id)}
                   />
                 ))}
