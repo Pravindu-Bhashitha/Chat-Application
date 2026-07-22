@@ -50,8 +50,8 @@ const ChatArea = ({
     }
 
     return (
-        <div className="d-flex flex-column flex-grow-1 bg-light">
-            <div className="bg-white border-bottom p-3 d-flex align-items-center gap-2 shadow-sm">
+        <div className="d-flex flex-column h-100 bg-light overflow-hidden">
+            <div className="bg-white border-bottom p-3 d-flex align-items-center gap-2 shadow-sm flex-shrink-0">
                 <span
                     style={{
                         width: '10px',
@@ -95,7 +95,7 @@ const ChatArea = ({
                 )}
                 <div ref={messagesEndRef} />
             </div>
-            <div className="bg-white border-top p-3">
+            <div className="bg-white border-top p-3 flex-shrink-0">
                 <Form onSubmit={onSendMessage}>
                     <InputGroup>
                         <Form.Control
