@@ -15,7 +15,7 @@ interface User {
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const { onlineUserIds } = useSocket();
+  const { socket, onlineUserIds, fetchOnlineUsers } = useSocket();
   console.log("onlineUserIds", onlineUserIds);
 
   const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -48,6 +48,12 @@ const Dashboard = () => {
 
     fetchUsers();
   }, [navigate]);
+
+  useEffect(() => {
+    if (socket) {
+      fetchOnlineUsers();
+    }
+  }, [socket, fetchOnlineUsers]);
 
   const handleLogout = () => {
     localStorage.removeItem('token');

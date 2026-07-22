@@ -1,14 +1,16 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 
 interface SocketContextType {
   socket: Socket | null;
   onlineUserIds: string[];
+  fetchOnlineUsers: () => void;
 }
 
 const SocketContext = createContext<SocketContextType>({
   socket: null,
   onlineUserIds: [],
+  fetchOnlineUsers: () => { },
 });
 
 export const useSocket = () => useContext(SocketContext);
@@ -17,13 +19,23 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [socket, setSocket] = useState<Socket | null>(null);
   const [onlineUserIds, setOnlineUserIds] = useState<string[]>([]);
 
+  const token = localStorage.getItem('token');
+
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) return;
+
+    // if (!token) return;
+    if (!token) {
+      if (socket) {
+        socket.disconnect();
+        setSocket(null);
+      }
+      return;
+    }
 
     // Connect to Chat Service WebSocket server (Port 4002)
     const newSocket = io('http://localhost:4002', {
       auth: { token },
+      autoConnect: true,
     });
 
     newSocket.on('connect', () => {
@@ -52,10 +64,16 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     return () => {
       newSocket.disconnect();
     };
-  }, []);
+  }, [token]);
+
+  const fetchOnlineUsers = useCallback(() => {
+    if (socket && socket.connected) {
+      socket.emit('get_online_users');
+    }
+  }, [socket]);
 
   return (
-    <SocketContext.Provider value={{ socket, onlineUserIds }}>
+    <SocketContext.Provider value={{ socket, onlineUserIds, fetchOnlineUsers }}>
       {children}
     </SocketContext.Provider>
   );

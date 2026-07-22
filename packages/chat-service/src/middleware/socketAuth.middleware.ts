@@ -29,7 +29,6 @@ const socketAuthMiddleware = (socket: Socket, next: (err?: Error) => void) => {
       id: decoded.id,
       username: decoded.username || 'User',
     };
-    console.log(`✅ Socket authenticated: ${socket.data.user.username} (${socket.data.user.id})`);
     next();
   } catch (err) {
     console.error('❌ JWT Verification Failed:', err);
