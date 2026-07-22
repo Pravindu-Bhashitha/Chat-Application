@@ -1,37 +1,47 @@
 import { Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-
-const prisma = new PrismaClient();
+import { AuthService } from '../services/auth.service';
 
 export const register = async (req: Request, res: Response) => {
-  const { username, email, password } = req.body;
-  const hashedPassword = await bcrypt.hash(password, 10);
   try {
-    const user = await prisma.user.create({
-      data: { username, email, password: hashedPassword },
-      select: { id: true, username: true, email: true }
-    });
+    const { username, email, password } = req.body;
+
+    if (!username || !email || !password) {
+      return res.status(400).json({ error: 'All fields are required' });
+    }
+
+    const user = await AuthService.registerUser({ username, email, password });
     return res.status(201).json(user);
-  } catch (err) {
-    return res.status(409).json({ error: 'User or email already exists' });
+  } catch (err: any) {
+    if (err.message === 'USER_EXISTS') {
+      return res.status(409).json({ error: 'User or email already exists' });
+    }
+    return res.status(500).json({ error: 'Internal server error' });
   }
 };
 
 export const login = async (req: Request, res: Response) => {
-  const { email, password } = req.body;
-  const user = await prisma.user.findUnique({ where: { email } });
-  if (!user || !(await bcrypt.compare(password, user.password))) {
-    return res.status(401).json({ error: 'Invalid credentials' });
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({ error: 'Email and password are required' });
+    }
+
+    const authData = await AuthService.loginUser({ email, password });
+    return res.json(authData);
+  } catch (err: any) {
+    if (err.message === 'INVALID_CREDENTIALS') {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+    return res.status(500).json({ error: 'Internal server error' });
   }
-  const token = jwt.sign({ userId: user.id, username: user.username }, process.env.JWT_SECRET || 'secret', { expiresIn: '1d' });
-  return res.json({ token, user: { id: user.id, username: user.username, email: user.email } });
 };
 
-export const getUsers = async (req: Request, res: Response) => {
-  const users = await prisma.user.findMany({
-    select: { id: true, username: true, email: true }
-  });
-  return res.json(users);
+export const getUsers = async (_req: Request, res: Response) => {
+  try {
+    const users = await AuthService.getAllUsers();
+    return res.json(users);
+  } catch (err) {
+    return res.status(500).json({ error: 'Failed to fetch users' });
+  }
 };
