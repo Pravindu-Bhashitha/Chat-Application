@@ -2,9 +2,10 @@ import { useState, useEffect } from 'react';
 import { Container, Card, ListGroup, Badge, Spinner, Alert } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import Header from '../../components/Header.tsx/Header';
-import UserCard from '../../components/UserCard';
+import UserCard from '../../components/UserCard/UserCard';
 import Footer from '../../components/Footer/Footer';
 import { authService } from '../../api/authService/authService';
+import { useSocket } from '../../context/SocketContext';
 
 interface User {
   id: string;
@@ -13,12 +14,15 @@ interface User {
 }
 
 const Dashboard = () => {
+  const navigate = useNavigate();
+  const { onlineUserIds } = useSocket();
+  console.log("onlineUserIds", onlineUserIds);
+
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [users, setUsers] = useState<User[]>([]);
+  console.log("users", users);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-
-  const navigate = useNavigate();
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -63,7 +67,7 @@ const Dashboard = () => {
                   User Directory
                 </h4>
                 <p className="text-muted small mb-0">
-                  Registered users ready to connect
+                  Real-time active status monitoring
                 </p>
               </div>
               <Badge bg="info" className="fs-6 px-3 py-2 text-wrap">
@@ -85,7 +89,8 @@ const Dashboard = () => {
                     key={user.id}
                     username={user.username}
                     email={user.email}
-                    isCurrentUser={currentUser?.id === user.id}
+                    isCurrentUser={(currentUser?.id || (currentUser as any)?.userId) === user.id}
+                    isOnline={onlineUserIds.includes(user.id)}
                   />
                 ))}
               </ListGroup>

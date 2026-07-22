@@ -1,12 +1,15 @@
 
 import './App.css'
+import { SocketProvider } from './context/SocketContext'
 import Router from './router/router'
 
 function App() {
 
   return (
     <>
-      <Router/>
+      <SocketProvider>
+        <Router />
+      </SocketProvider>
     </>
   )
 }
