@@ -1,7 +1,10 @@
 import express from 'express';
 import cors from 'cors';
 import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
 import messageService from './services/message.service';
+
+dotenv.config({ override: true });
 
 const app = express();
 const PORT = process.env.PORT || 4003;

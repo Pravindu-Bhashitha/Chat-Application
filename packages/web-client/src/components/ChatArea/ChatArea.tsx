@@ -2,6 +2,7 @@ import React, { useRef, useEffect } from 'react';
 import { Form, InputGroup } from 'react-bootstrap';
 import { Message, User } from '../../types';
 import CustomButton from '../CustomButton/CustomButton';
+import { messageService } from '../../api/messageService/messageService';
 
 interface ChatAreaProps {
     selectedUser: User | null;
@@ -42,6 +43,11 @@ const ChatArea = ({
             (msg.senderId === currentUserId && msg.receiverId === selectedUser.id) ||
             (msg.senderId === selectedUser.id && msg.receiverId === currentUserId)
     );
+
+    const sendMessage = async () => {
+        const response = messageService.saveConversation(currentUserId || '', selectedUser.id, inputMessage);
+        console.log('Message sent:', response);
+    }
 
     return (
         <div className="d-flex flex-column flex-grow-1 bg-light">
@@ -103,6 +109,7 @@ const ChatArea = ({
                             type="submit"
                             className="rounded-end-pill px-4"
                             loading={false}
+                            onClick={sendMessage}
                         >
                             Send
                         </CustomButton>

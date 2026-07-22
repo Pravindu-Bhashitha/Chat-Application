@@ -3,7 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import authRoutes from './routes/auth.routes';
 
-dotenv.config();
+dotenv.config({ override: true });
 
 const app = express();
 app.use(express.json());
