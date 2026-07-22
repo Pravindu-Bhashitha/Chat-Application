@@ -1,0 +1,38 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Compiled Build Outputs
+dist/
+build/
+*.tsbuildinfo
+
+# Environment Variables & Secrets (CRITICAL)
+.env
+.env.local
+.env.*.local
+
+# Database & Prisma
+prisma/dev.db
+prisma/dev.db-journal
+
+# IDEs and OS System Files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.DS_Store
+Thumbs.db
+
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# Docker Volumes / Local Storage
+postgres_data/

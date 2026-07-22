@@ -1,0 +1,14 @@
+{
+    "name": "chat-app-monorepo",
+    "version": "1.0.0",
+    "private": true,
+    "workspaces": [
+        "packages/*"
+    ],
+    "scripts": {
+        "dev:auth": "npm run dev --workspace=packages/auth-service",
+        "dev:chat": "npm run dev --workspace=packages/chat-service",
+        "dev:message": "npm run dev --workspace=packages/message-service",
+        "dev:client": "npm run dev --workspace=packages/web-client"
+    }
+}
