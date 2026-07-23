@@ -1,5 +1,6 @@
 
 import './App.css'
+import { AuthProvider } from './context/AuthContext'
 import { SocketProvider } from './context/SocketContext'
 import Router from './router/router'
 
@@ -7,9 +8,11 @@ function App() {
 
   return (
     <>
-      <SocketProvider>
-        <Router />
-      </SocketProvider>
+      <AuthProvider>
+        <SocketProvider>
+          <Router />
+        </SocketProvider>
+      </AuthProvider>
     </>
   )
 }
