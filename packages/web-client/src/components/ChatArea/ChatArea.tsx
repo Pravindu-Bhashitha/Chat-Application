@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from 'react';
-import { Form, InputGroup } from 'react-bootstrap';
+import { Button, Form, InputGroup } from 'react-bootstrap';
 import { Message, User } from '../../types';
 import CustomButton from '../CustomButton/CustomButton';
 import { messageService } from '../../api/messageService/messageService';
@@ -15,6 +15,7 @@ interface ChatAreaProps {
     onInputChange: (value: string) => void;
     onSendMessage: (e: React.FormEvent) => void;
     presences: Record<string, { status: StatusType; customNote?: string }>;
+    onBack: () => void;
 }
 
 const ChatArea = ({
@@ -25,7 +26,8 @@ const ChatArea = ({
     inputMessage,
     onInputChange,
     onSendMessage,
-    presences
+    presences,
+    onBack,
 }: ChatAreaProps) => {
     const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
@@ -57,6 +59,15 @@ const ChatArea = ({
     return (
         <div className="d-flex flex-column h-100 bg-light overflow-hidden">
             <div className="bg-white border-bottom p-3 d-flex align-items-center gap-2 shadow-sm flex-shrink-0">
+                {onBack && (
+                    <Button
+                        variant="link"
+                        className="d-md-none text-dark p-0 me-2 shadow-none text-decoration-none fs-4"
+                        onClick={onBack}
+                    >
+                        ←
+                    </Button>
+                )}
                 <span
                     style={{
                         width: '10px',

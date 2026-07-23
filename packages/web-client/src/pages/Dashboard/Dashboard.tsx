@@ -152,7 +152,14 @@ const Dashboard = () => {
       <Container fluid className="flex-grow-1 d-flex flex-column pb-3 overflow-hidden">
         <Row className="flex-grow-1 g-0 shadow-sm rounded border bg-white overflow-hidden">
           {/* User Directory Sidebar */}
-          <Col md={4} lg={3} className="d-flex flex-column h-100">
+         <Col
+            xs={12}
+            md={4}
+            lg={3}
+            className={`d-flex flex-column h-100 border-end ${
+              selectedUser ? 'd-none d-md-flex' : 'd-flex'
+            }`}
+          >
             <UserList
               users={users}
               currentUserId={currentUser?.id}
@@ -167,7 +174,14 @@ const Dashboard = () => {
           </Col>
 
           {/* Active Chat Window */}
-          <Col md={8} lg={9} className="d-flex flex-column h-100">
+          <Col
+            xs={12}
+            md={8}
+            lg={9}
+            className={`d-flex flex-column h-100 ${
+              !selectedUser ? 'd-none d-md-flex' : 'd-flex'
+            }`}
+          >
             <ChatArea
               selectedUser={selectedUser}
               currentUserId={currentUser?.id}
@@ -177,6 +191,7 @@ const Dashboard = () => {
               onInputChange={setInputMessage}
               onSendMessage={handleSendMessage}
               presences={presences}
+              onBack={() => setSelectedUser(null)}
             />
           </Col>
         </Row>
