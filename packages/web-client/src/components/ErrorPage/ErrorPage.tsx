@@ -27,7 +27,7 @@ export const ErrorPage: React.FC<ErrorPageProps> = ({
               Try Again
             </Button>
           ) : (
-            <Button variant="primary" onClick={() => navigate('/dashboard')}>
+            <Button variant="primary" onClick={() => navigate('/')}>
               Back to Home
             </Button>
           )}

@@ -1,5 +1,5 @@
 import { lazy, Suspense } from "react";
-import { BrowserRouter as AppRouter, Navigate, Route, Routes } from "react-router-dom";
+import { BrowserRouter as AppRouter, Route, Routes } from "react-router-dom";
 import { ProtectedRoute } from "./protectedRoute";
 
 
