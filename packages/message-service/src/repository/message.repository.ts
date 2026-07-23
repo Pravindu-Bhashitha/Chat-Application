@@ -55,7 +55,7 @@ export async function getPaginatedConversation(
 
     // Reverse back so client receives them in chronological order [old -> new]
     return {
-        messages: resultMessages.reverse(),
+        messages: resultMessages,
         hasMore,
     };
 }
