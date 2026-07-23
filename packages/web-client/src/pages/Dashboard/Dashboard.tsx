@@ -23,13 +23,16 @@ const Dashboard = () => {
   console.log("onlineUserIds", onlineUserIds);
 
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+  console.log("currentUser", currentUser);
   const [users, setUsers] = useState<User[]>([]);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  console.log("selectedUser", selectedUser);
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState('');
 
   const [lastMessages, setLastMessages] = useState<Record<string, Message>>({});
+  console.log("lastMessages", lastMessages);
   console.log("users", users);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -70,19 +73,33 @@ const Dashboard = () => {
 
     const fetchChatHistory = async () => {
       try {
-        const response = await messageService.getConversation(selectedUser.id);
-        if (response) {
-          setMessages(response);
+        // const response = await messageService.getConversation(selectedUser.id);
+        const response = await messageService.getPaginatedMessages(selectedUser.id, 5,lastMessages[selectedUser.id]?.id);
+        console.log('Fetched chat history:', response);
+        // if (response) {
+        //   setMessages(response);
 
-          // Update last message preview for the selected user if history exists
-          if (response.length > 0) {
-            const latest = response[response.length - 1];
-            setLastMessages((prev) => ({
-              ...prev,
-              [selectedUser.id]: latest,
-            }));
-          }
+        //   // Update last message preview for the selected user if history exists
+        //   if (response.length > 0) {
+        //     const latest = response[response.length - 1];
+        //     setLastMessages((prev) => ({
+        //       ...prev,
+        //       [selectedUser.id]: latest,
+        //     }));
+        //   }
+        // }
+        if (response && response.messages) {
+        setMessages(response.messages);
+
+        // Update last message preview for the sidebar
+        if (response.messages.length > 0) {
+          const latest = response.messages[response.messages.length - 1];
+          setLastMessages((prev) => ({
+            ...prev,
+            [selectedUser.id]: latest,
+          }));
         }
+      }
       } catch (err) {
         console.error('Failed to load message history:', err);
       }
@@ -106,23 +123,41 @@ const Dashboard = () => {
     };
   }, [socket]);
 
-  useEffect(() => {
-    if (!selectedUser) return;
+  const handleLoadOlderMessages = async (oldestMessageId: string): Promise<boolean> => {
+    if (!selectedUser) return false;
 
-    const fetchChatHistory = async () => {
-      try {
-        const response = await messageService.getConversation(selectedUser.id);
+    try {
+        const response = await messageService.getPaginatedMessages(selectedUser.id, 20, oldestMessageId);
 
-        if (response) {
-          setMessages(response);
+        if (response?.messages && response.messages.length > 0) {
+            // Prepend historical messages to existing array state
+            setMessages((prev) => [...response.messages, ...prev]);
+            return response.hasMore; // Return true if server has additional pages
         }
-      } catch (err) {
-        console.error('Failed to load message history:', err);
-      }
-    };
+        return false;
+    } catch (err) {
+        console.error('Failed to load older messages:', err);
+        return false;
+    }
+};
 
-    fetchChatHistory();
-  }, [selectedUser]);
+  // useEffect(() => {
+  //   if (!selectedUser) return;
+
+  //   const fetchChatHistory = async () => {
+  //     try {
+  //       const response = await messageService.getConversation(selectedUser.id);
+
+  //       if (response) {
+  //         setMessages(response);
+  //       }
+  //     } catch (err) {
+  //       console.error('Failed to load message history:', err);
+  //     }
+  //   };
+
+  //   fetchChatHistory();
+  // }, [selectedUser]);
 
   // Send Message Handler
   const handleSendMessage = (e: React.FormEvent) => {
@@ -152,7 +187,26 @@ const Dashboard = () => {
       <Container fluid className="flex-grow-1 d-flex flex-column pb-3 overflow-hidden">
         <Row className="flex-grow-1 g-0 shadow-sm rounded border bg-white overflow-hidden">
           {/* User Directory Sidebar */}
-          <Col md={4} lg={3} className="d-flex flex-column h-100">
+          {/* <Col md={4} lg={3} className="d-flex flex-column h-100">
+            <UserList
+              users={users}
+              currentUserId={currentUser?.id}
+              selectedUserId={selectedUser?.id}
+              onlineUserIds={onlineUserIds}
+              lastMessages={lastMessages}
+              loading={loading}
+              error={error}
+              onSelectUser={(user) => setSelectedUser(user)}
+              presences={presences}
+            />
+          </Col> */}
+          <Col
+            xs={12}
+            md={4}
+            lg={3}
+            className={`d-flex flex-column h-100 border-end ${selectedUser ? 'd-none d-md-flex' : 'd-flex'
+              }`}
+          >
             <UserList
               users={users}
               currentUserId={currentUser?.id}
@@ -165,9 +219,8 @@ const Dashboard = () => {
               presences={presences}
             />
           </Col>
-
           {/* Active Chat Window */}
-          <Col md={8} lg={9} className="d-flex flex-column h-100">
+          {/* <Col md={8} lg={9} className="d-flex flex-column h-100">
             <ChatArea
               selectedUser={selectedUser}
               currentUserId={currentUser?.id}
@@ -177,6 +230,26 @@ const Dashboard = () => {
               onInputChange={setInputMessage}
               onSendMessage={handleSendMessage}
               presences={presences}
+            />
+          </Col> */}
+          <Col
+            xs={12}
+            md={8}
+            lg={9}
+            className={`d-flex flex-column h-100 ${!selectedUser ? 'd-none d-md-flex' : 'd-flex'
+              }`}
+          >
+            <ChatArea
+              selectedUser={selectedUser}
+              currentUserId={currentUser?.id}
+              onlineUserIds={onlineUserIds}
+              messages={messages}
+              inputMessage={inputMessage}
+              onInputChange={setInputMessage}
+              onSendMessage={handleSendMessage}
+              onBack={() => setSelectedUser(null)} // <-- Deselect user on mobile back button
+              presences={presences}
+              onLoadOlderMessages={handleLoadOlderMessages} // <-- Pass pagination handler
             />
           </Col>
         </Row>

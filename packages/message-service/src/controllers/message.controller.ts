@@ -43,3 +43,28 @@ export const getConversationController = async (req: AuthenticatedRequest, res: 
     res.status(500).json({ error: 'Failed to fetch conversation history' });
   }
 };
+
+export async function getPaginatedConversation(req: AuthenticatedRequest, res: Response) {
+  try {
+    const userId = req.user?.id;
+    const { otherUserId } = req.params;
+    const { limit, before } = req.query;
+
+    console.log(`Fetching paginated messages for userId: ${userId}, otherUserId: ${otherUserId}, limit: ${limit}, before: ${before}`);
+    if (!userId || !otherUserId) {
+      return res.status(400).json({ error: 'User IDs are required' });
+    }
+
+    const data = await messageService.getPaginatedMessages(
+      userId,
+      otherUserId,
+      Number(limit) || 20,
+      before as string | undefined
+    );
+
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch conversation' });
+  }
+}
+      

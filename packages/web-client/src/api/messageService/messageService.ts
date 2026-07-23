@@ -15,5 +15,19 @@ export const messageService = {
             throw new Error('Failed to save message');
         }
         return response.data;
+    },
+    getPaginatedMessages: async (targetUserId: string,limit: number = 20,beforeMessageId?: string) => {
+        const params: Record<string, any> = { limit };
+        if (beforeMessageId) {
+            params.before = beforeMessageId;
+        }
+
+        // GET /api/messages/paginated/TARGET_USER_ID?limit=20&before=XYZ
+        const response = await messageApi.get(`/messages/paginated/${targetUserId}`, { params });
+
+        if (!response) {
+            throw new Error('Failed to fetch paginated messages');
+        }
+        return response.data;
     }
 };
