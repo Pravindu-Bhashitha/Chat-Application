@@ -2,6 +2,7 @@ import { ListGroup, Alert } from 'react-bootstrap';
 import { Message, User } from '../../types';
 import UserCard from '../UserCard/UserCard';
 import Loading from '../Loading/Loading';
+import { StatusType } from '../../context/SocketContext';
 
 interface UserListProps {
     users: User[];
@@ -12,6 +13,7 @@ interface UserListProps {
     error: string;
     onSelectUser: (user: User) => void;
     lastMessages?: Record<string, Message>;
+    presences: Record<string, { status: StatusType; customNote?: string }>;
 }
 
 const UserList = ({
@@ -23,6 +25,7 @@ const UserList = ({
     error,
     onSelectUser,
     lastMessages = {},
+    presences
 }: UserListProps) => {
     if (loading) {
         // return (
@@ -55,6 +58,8 @@ const UserList = ({
                         const isSelected = selectedUserId === user.id;
                         const lastMsg = lastMessages[user.id];
 
+                        const status = presences[user.id]?.status || 'Offline';
+
                         return (
                             <div
                                 key={user.id}
@@ -72,6 +77,7 @@ const UserList = ({
                                     lastMessage={lastMsg?.content}
                                     timestamp={lastMsg?.timestamp || lastMsg?.timestamp}
                                     onSelect={() => onSelectUser(user)}
+                                    status={status}
                                 />
                             </div>
                         );

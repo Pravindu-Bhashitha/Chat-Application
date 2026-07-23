@@ -1,5 +1,8 @@
 import { ListGroup, Badge } from 'react-bootstrap';
 import { formatTimestamp } from '../../utils/timeFormatStamp';
+import { getStatusBadge } from '../../utils/statusBadge';
+import { getStatusColor } from '../../utils/statusColor';
+import { StatusType } from '../../context/SocketContext';
 
 interface UserCardProps {
   username: string;
@@ -9,9 +12,10 @@ interface UserCardProps {
   onSelect?: () => void;
   lastMessage?: string;
   timestamp?: string;
+  status?: StatusType;
 }
 
-const UserCard = ({ username, isCurrentUser, isOnline, onSelect, lastMessage, timestamp }: UserCardProps) => {
+const UserCard = ({ username, isCurrentUser, isOnline, onSelect, lastMessage, timestamp, status }: UserCardProps) => {
   return (
     <ListGroup.Item action onClick={onSelect} className="d-flex justify-content-between align-items-center py-3 px-4">
       <div className="d-flex align-items-center gap-3">
@@ -20,14 +24,14 @@ const UserCard = ({ username, isCurrentUser, isOnline, onSelect, lastMessage, ti
             width: '12px',
             height: '12px',
             borderRadius: '50%',
-            backgroundColor: isOnline ? '#22c55e' : '#cbd5e1',
+            backgroundColor: getStatusColor(status),
             display: 'inline-block',
           }}
           title={isOnline ? 'Online' : 'Offline'}
         />
         <div>
           <div className="fw-bold text-dark d-flex align-items-center gap-2">
-            {username}
+            {username}{getStatusBadge(status)}
             {isCurrentUser && <Badge bg="secondary" style={{ fontSize: '0.65rem' }}>You</Badge>}
           </div>
           <small

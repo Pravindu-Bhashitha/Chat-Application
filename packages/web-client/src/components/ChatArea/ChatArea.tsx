@@ -3,6 +3,8 @@ import { Form, InputGroup } from 'react-bootstrap';
 import { Message, User } from '../../types';
 import CustomButton from '../CustomButton/CustomButton';
 import { messageService } from '../../api/messageService/messageService';
+import { StatusType } from '../../context/SocketContext';
+import { getStatusColor } from '../../utils/statusColor';
 
 interface ChatAreaProps {
     selectedUser: User | null;
@@ -12,6 +14,7 @@ interface ChatAreaProps {
     inputMessage: string;
     onInputChange: (value: string) => void;
     onSendMessage: (e: React.FormEvent) => void;
+    presences: Record<string, { status: StatusType; customNote?: string }>;
 }
 
 const ChatArea = ({
@@ -22,6 +25,7 @@ const ChatArea = ({
     inputMessage,
     onInputChange,
     onSendMessage,
+    presences
 }: ChatAreaProps) => {
     const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
@@ -38,6 +42,7 @@ const ChatArea = ({
     }
 
     const isOnline = onlineUserIds.includes(selectedUser.id);
+    const status = presences[selectedUser.id]?.status || 'Offline';
     const activeChatMessages = messages.filter(
         (msg) =>
             (msg.senderId === currentUserId && msg.receiverId === selectedUser.id) ||
@@ -57,11 +62,11 @@ const ChatArea = ({
                         width: '10px',
                         height: '10px',
                         borderRadius: '50%',
-                        backgroundColor: isOnline ? '#22c55e' : '#cbd5e1',
+                        backgroundColor: getStatusColor(status),
                     }}
                 />
                 <h5 className="m-0 fw-bold">{selectedUser.username}</h5>
-                <span className="text-muted small">({isOnline ? 'Online' : 'Offline'})</span>
+                <span className="text-muted small">({isOnline ? status : 'Offline'})</span>
             </div>
             <div className="flex-grow-1 p-3 overflow-auto d-flex flex-column gap-3">
                 {activeChatMessages.length === 0 ? (

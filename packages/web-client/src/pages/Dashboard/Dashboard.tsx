@@ -18,7 +18,8 @@ interface User {
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const { socket, onlineUserIds, fetchOnlineUsers } = useSocket();
+  // const { socket, onlineUserIds, fetchOnlineUsers } = useSocket();
+  const { socket, onlineUserIds, presences, fetchOnlineUsers } = useSocket();
   console.log("onlineUserIds", onlineUserIds);
 
   const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -161,6 +162,7 @@ const Dashboard = () => {
               loading={loading}
               error={error}
               onSelectUser={(user) => setSelectedUser(user)}
+              presences={presences}
             />
           </Col>
 
@@ -174,6 +176,7 @@ const Dashboard = () => {
               inputMessage={inputMessage}
               onInputChange={setInputMessage}
               onSendMessage={handleSendMessage}
+              presences={presences}
             />
           </Col>
         </Row>

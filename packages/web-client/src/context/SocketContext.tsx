@@ -1,23 +1,40 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 
+export type StatusType = 'Available' | 'Away' | 'Busy' | 'Offline';
+
+// interface SocketContextType {
+//   socket: Socket | null;
+//   onlineUserIds: string[];
+//   fetchOnlineUsers: () => void;
+// }
+
+export interface UserPresence {
+  status: StatusType;
+  customNote?: string;
+}
+
 interface SocketContextType {
   socket: Socket | null;
   onlineUserIds: string[];
+  presences: Record<string, UserPresence>;
+  updateStatus: (status: StatusType, customNote?: string) => void;
   fetchOnlineUsers: () => void;
 }
 
 const SocketContext = createContext<SocketContextType>({
   socket: null,
   onlineUserIds: [],
-  fetchOnlineUsers: () => { },
+  presences: {},
+  updateStatus: () => {},
+  fetchOnlineUsers: () => {},
 });
-
 export const useSocket = () => useContext(SocketContext);
 
 export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [socket, setSocket] = useState<Socket | null>(null);
   const [onlineUserIds, setOnlineUserIds] = useState<string[]>([]);
+  const [presences, setPresences] = useState<Record<string, UserPresence>>({});
 
   const token = localStorage.getItem('token');
 
@@ -50,12 +67,39 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     });
 
     // Listen for real-time online status changes
-    newSocket.on('user_online', ({ onlineUsers }: { onlineUsers: string[] }) => {
-      setOnlineUserIds(onlineUsers);
+    // newSocket.on('user_online', ({ onlineUsers }: { onlineUsers: string[] }) => {
+    //   setOnlineUserIds(onlineUsers);
+    // });
+
+    // newSocket.on('user_offline', ({ onlineUsers }: { onlineUsers: string[] }) => {
+    //   setOnlineUserIds(onlineUsers);
+    // });
+    // Listen for initial full presences map
+    newSocket.on('get_all_presences', (presencesData: Record<string, UserPresence>) => {
+      setPresences(presencesData);
     });
 
-    newSocket.on('user_offline', ({ onlineUsers }: { onlineUsers: string[] }) => {
-      setOnlineUserIds(onlineUsers);
+    // Listen for real-time presence changes
+    newSocket.on('presence_changed', ({ userId, status, customNote, presences: updatedPresences }) => {
+      if (updatedPresences) {
+        setPresences(updatedPresences);
+      } else {
+        setPresences((prev) => ({
+          ...prev,
+          [userId]: { status, customNote },
+        }));
+      }
+    });
+
+    // Listen for real-time online status changes
+    newSocket.on('user_online', (data: { onlineUsers: string[]; presences?: Record<string, UserPresence> }) => {
+      setOnlineUserIds(data.onlineUsers);
+      if (data.presences) setPresences(data.presences);
+    });
+
+    newSocket.on('user_offline', (data: { onlineUsers: string[]; presences?: Record<string, UserPresence> }) => {
+      setOnlineUserIds(data.onlineUsers);
+      if (data.presences) setPresences(data.presences);
     });
     
     setSocket(newSocket);
@@ -66,6 +110,15 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     };
   }, [token]);
 
+  const updateStatus = useCallback(
+    (status: StatusType, customNote?: string) => {
+      if (socket && socket.connected) {
+        socket.emit('update_presence', { status, customNote });
+      }
+    },
+    [socket]
+  );
+
   const fetchOnlineUsers = useCallback(() => {
     if (socket && socket.connected) {
       socket.emit('get_online_users');
@@ -73,7 +126,13 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   }, [socket]);
 
   return (
-    <SocketContext.Provider value={{ socket, onlineUserIds, fetchOnlineUsers }}>
+    <SocketContext.Provider value={{
+        socket,
+        onlineUserIds,
+        presences,
+        updateStatus,
+        fetchOnlineUsers,
+      }}>
       {children}
     </SocketContext.Provider>
   );
