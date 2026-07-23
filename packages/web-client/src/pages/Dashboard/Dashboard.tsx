@@ -27,6 +27,8 @@ const Dashboard = () => {
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState('');
+
+  const [lastMessages, setLastMessages] = useState<Record<string, Message>>({});
   console.log("users", users);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -61,6 +63,32 @@ const Dashboard = () => {
       fetchOnlineUsers();
     }
   }, [socket, fetchOnlineUsers]);
+
+  useEffect(() => {
+    if (!selectedUser) return;
+
+    const fetchChatHistory = async () => {
+      try {
+        const response = await messageService.getConversation(selectedUser.id);
+        if (response) {
+          setMessages(response);
+
+          // Update last message preview for the selected user if history exists
+          if (response.length > 0) {
+            const latest = response[response.length - 1];
+            setLastMessages((prev) => ({
+              ...prev,
+              [selectedUser.id]: latest,
+            }));
+          }
+        }
+      } catch (err) {
+        console.error('Failed to load message history:', err);
+      }
+    };
+
+    fetchChatHistory();
+  }, [selectedUser]);
 
   // Listen for real-time incoming messages
   useEffect(() => {
@@ -129,6 +157,7 @@ const Dashboard = () => {
               currentUserId={currentUser?.id}
               selectedUserId={selectedUser?.id}
               onlineUserIds={onlineUserIds}
+              lastMessages={lastMessages}
               loading={loading}
               error={error}
               onSelectUser={(user) => setSelectedUser(user)}

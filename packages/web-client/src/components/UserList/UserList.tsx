@@ -1,5 +1,5 @@
 import { ListGroup, Alert } from 'react-bootstrap';
-import { User } from '../../types';
+import { Message, User } from '../../types';
 import UserCard from '../UserCard/UserCard';
 import Loading from '../Loading/Loading';
 
@@ -11,6 +11,7 @@ interface UserListProps {
     loading: boolean;
     error: string;
     onSelectUser: (user: User) => void;
+    lastMessages?: Record<string, Message>;
 }
 
 const UserList = ({
@@ -21,6 +22,7 @@ const UserList = ({
     loading,
     error,
     onSelectUser,
+    lastMessages = {},
 }: UserListProps) => {
     if (loading) {
         // return (
@@ -51,6 +53,7 @@ const UserList = ({
                     {otherUsers.map((user) => {
                         const isOnline = onlineUserIds.includes(user.id);
                         const isSelected = selectedUserId === user.id;
+                        const lastMsg = lastMessages[user.id];
 
                         return (
                             <div
@@ -66,6 +69,8 @@ const UserList = ({
                                     email={user.email}
                                     isCurrentUser={false}
                                     isOnline={isOnline}
+                                    lastMessage={lastMsg?.content}
+                                    timestamp={lastMsg?.timestamp || lastMsg?.timestamp}
                                     onSelect={() => onSelectUser(user)}
                                 />
                             </div>
