@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { AuthService } from '../services/auth.service';
+import { getAllUsers, loginUser, registerUser } from '../services/auth.service';
 
 export const register = async (req: Request, res: Response) => {
   try {
@@ -9,7 +9,7 @@ export const register = async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'All fields are required' });
     }
 
-    const user = await AuthService.registerUser({ username, email, password });
+    const user = await registerUser({ username, email, password });
     return res.status(201).json(user);
   } catch (err: any) {
     if (err.message === 'USER_EXISTS') {
@@ -28,7 +28,7 @@ export const login = async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Email and password are required' });
     }
 
-    const authData = await AuthService.loginUser({ email, password });
+    const authData = await loginUser({ email, password });
 
     return res.json(authData);
   } catch (err: any) {
@@ -42,7 +42,7 @@ export const login = async (req: Request, res: Response) => {
 
 export const getUsers = async (_req: Request, res: Response) => {
   try {
-    const users = await AuthService.getAllUsers();
+    const users = await getAllUsers();
     return res.json(users);
   } catch (err) {
     return res.status(500).json({ error: 'Failed to fetch users' });
