@@ -1,6 +1,7 @@
-import { ListGroup, Spinner, Alert } from 'react-bootstrap';
+import { ListGroup, Alert } from 'react-bootstrap';
 import { User } from '../../types';
 import UserCard from '../UserCard/UserCard';
+import Loading from '../Loading/Loading';
 
 interface UserListProps {
     users: User[];
@@ -22,11 +23,12 @@ const UserList = ({
     onSelectUser,
 }: UserListProps) => {
     if (loading) {
-        return (
-            <div className="text-center p-4">
-                <Spinner animation="border" variant="primary" />
-            </div>
-        );
+        // return (
+        //     <div className="text-center p-4">
+        //         <Spinner animation="border" variant="primary" />
+        //     </div>
+        // );
+        return <Loading fullScreen={false} />;
     }
 
     if (error) {
