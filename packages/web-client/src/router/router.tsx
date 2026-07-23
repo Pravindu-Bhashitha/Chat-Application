@@ -1,5 +1,6 @@
 import { lazy, Suspense } from "react";
 import { BrowserRouter as AppRouter, Navigate, Route, Routes } from "react-router-dom";
+import { ProtectedRoute } from "./protectedRoute";
 
 
 const Register = lazy(() => import("../pages/Auth/Register"));
@@ -14,7 +15,9 @@ const Router = () => {
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
           <Route path="*" element={<Navigate to="/login" replace />} />
-          <Route path="/" element={<Dashboard />} />
+          <Route element={<ProtectedRoute />}>
+            <Route path="/" element={<Dashboard />} />
+          </Route>
         </Routes>
       </Suspense>
     </AppRouter>
