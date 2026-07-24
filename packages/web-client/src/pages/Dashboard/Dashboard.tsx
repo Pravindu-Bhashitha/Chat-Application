@@ -19,10 +19,8 @@ interface User {
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  // const { socket, onlineUserIds, fetchOnlineUsers } = useSocket();
   const { socket, onlineUserIds, presences, fetchOnlineUsers, disconnectSocket } = useSocket();
-  const {logoutUser} = useAuth();
-  // console.log("onlineUserIds", onlineUserIds);
+  const { logoutUser } = useAuth();
 
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [users, setUsers] = useState<User[]>([]);
@@ -30,12 +28,12 @@ const Dashboard = () => {
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState('');
-
   const [lastMessages, setLastMessages] = useState<Record<string, Message>>({});
-  console.log("users", users);
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
+  // 1. Initial Authentication & User Hydration
   useEffect(() => {
     const token = localStorage.getItem('token');
     const savedUser = localStorage.getItem('user');
@@ -46,78 +44,57 @@ const Dashboard = () => {
     }
 
     setCurrentUser(JSON.parse(savedUser));
+  }, [navigate]);
 
-    const fetchUsers = async () => {
+  // 2. Load User Directory & Recent Conversations in Parallel (Single Batch Load)
+  useEffect(() => {
+    if (!currentUser?.id) return;
+
+    const loadInitialDashboardData = async () => {
       try {
-        const data = await authService.getUsers();
-        setUsers(data);
-      } catch (err: any) {
-        setError('Failed to load user directory.');
+        setLoading(true);
+
+        const [allUsers, recentMsgs] = await Promise.all([
+          authService.getUsers(),
+          messageService.getRecentConversations()
+        ]);
+
+        setUsers(allUsers);
+
+        // Map targetUserId -> latest Message preview
+        const lastMsgMap: Record<string, Message> = {};
+        recentMsgs.forEach((msg: Message) => {
+          const otherUserId = msg.senderId === currentUser.id ? msg.receiverId : msg.senderId;
+          lastMsgMap[otherUserId] = msg;
+        });
+
+        setLastMessages(lastMsgMap);
+      } catch (err) {
+        setError('Failed to load user directory or message previews.');
       } finally {
         setLoading(false);
       }
     };
 
-    fetchUsers();
-  }, [navigate]);
+    loadInitialDashboardData();
+  }, [currentUser]);
 
+  // 3. Sync Online User Status
   useEffect(() => {
     if (socket) {
       fetchOnlineUsers();
     }
   }, [socket, fetchOnlineUsers]);
 
-  useEffect(() => {
-  if (!currentUser?.id) return;
-
-  const loadInitialData = async () => {
-    try {
-      setLoading(true);
-      
-      // Fetch user list and last messages in parallel
-      const [allUsers, recentMsgs] = await Promise.all([
-        authService.getUsers(),
-        messageService.getRecentConversations()
-      ]);
-
-      setUsers(allUsers);
-
-      // Build a map of targetUserId -> latest Message
-      const lastMsgMap: Record<string, Message> = {};
-      recentMsgs.forEach((msg: Message) => {
-        const otherUserId = msg.senderId === currentUser.id ? msg.receiverId : msg.senderId;
-        lastMsgMap[otherUserId] = msg;
-      });
-      console.log("lastMsgMap", lastMsgMap);
-
-      setLastMessages(lastMsgMap);
-    } catch (err) {
-      setError('Failed to load user directory or messages.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  loadInitialData();
-}, [currentUser]);
-
+  // 4. Fetch Selected User Chat History
   useEffect(() => {
     if (!selectedUser) return;
 
     const fetchChatHistory = async () => {
       try {
-        const response = await messageService.getConversation(selectedUser.id);
-        if (response) {
-          setMessages(response);
-
-          // Update last message preview for the selected user if history exists
-          if (response.length > 0) {
-            const latest = response[response.length - 1];
-            setLastMessages((prev) => ({
-              ...prev,
-              [selectedUser.id]: latest,
-            }));
-          }
+        const history = await messageService.getConversation(selectedUser.id);
+        if (history) {
+          setMessages(history);
         }
       } catch (err) {
         console.error('Failed to load message history:', err);
@@ -127,12 +104,23 @@ const Dashboard = () => {
     fetchChatHistory();
   }, [selectedUser]);
 
-  // Listen for real-time incoming messages
+  // 5. Real-Time Incoming Message Listener (Updates Active Chat + Previews Live)
   useEffect(() => {
-    if (!socket) return;
+    if (!socket || !currentUser?.id) return;
 
     const handleReceiveMessage = (newMessage: Message) => {
+      // Append to active chat if sender/receiver matches selected user
       setMessages((prev) => [...prev, newMessage]);
+
+      // Dynamically update the lastMessage preview for sidebar
+      const otherUserId = newMessage.senderId === currentUser.id 
+        ? newMessage.receiverId 
+        : newMessage.senderId;
+
+      setLastMessages((prev) => ({
+        ...prev,
+        [otherUserId]: newMessage,
+      }));
     };
 
     socket.on('receive_message', handleReceiveMessage);
@@ -140,25 +128,7 @@ const Dashboard = () => {
     return () => {
       socket.off('receive_message', handleReceiveMessage);
     };
-  }, [socket]);
-
-  // useEffect(() => {
-  //   if (!selectedUser) return;
-
-  //   const fetchChatHistory = async () => {
-  //     try {
-  //       const response = await messageService.getConversation(selectedUser.id);
-
-  //       if (response) {
-  //         setMessages(response);
-  //       }
-  //     } catch (err) {
-  //       console.error('Failed to load message history:', err);
-  //     }
-  //   };
-
-  //   fetchChatHistory();
-  // }, [selectedUser]);
+  }, [socket, currentUser]);
 
   // Send Message Handler
   const handleSendMessage = (e: React.FormEvent) => {
@@ -175,12 +145,10 @@ const Dashboard = () => {
 
 
   const handleLogout = () => {
-    disconnectSocket(); // Disconnect the socket when logging out
+    disconnectSocket();
     logoutUser();
     localStorage.removeItem('token');
-    console.log('Token removed from localStorage');
     localStorage.removeItem('user');
-    console.log('User removed from localStorage');
     navigate('/login');
   };
 
@@ -234,7 +202,6 @@ const Dashboard = () => {
           </Col>
         </Row>
       </Container>
-
       <Footer />
     </div>
   );
