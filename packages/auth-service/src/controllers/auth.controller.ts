@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { getAllUsers, loginUser, registerUser } from '../services/auth.service';
+import { AppError } from '../utils/AppError';
 
 export const register = async (req: Request, res: Response) => {
   try {
@@ -11,11 +12,11 @@ export const register = async (req: Request, res: Response) => {
 
     const user = await registerUser({ username, email, password });
     return res.status(201).json(user);
-  } catch (err: any) {
-    if (err.message === 'USER_EXISTS') {
-      return res.status(409).json({ error: 'User or email already exists' });
+  } catch (error) {
+    if (error instanceof AppError) {
+      return res.status(error.statusCode).json({ error: error.message, statusCode: error.statusCode });
     }
-    return res.status(500).json({ error: 'Internal server error' });
+    return res.status(500).json({ error: 'Internal server error', statusCode: 500 });
   }
 };
 
@@ -25,18 +26,18 @@ export const login = async (req: Request, res: Response) => {
     console.log('Login request received:', { email, password });
 
     if (!email || !password) {
-      return res.status(400).json({ error: 'Email and password are required' });
+      return res.status(400).json({ error: 'Email and password are required', statusCode: 400 });
     }
 
     const authData = await loginUser({ email, password });
 
     return res.json(authData);
-  } catch (err: any) {
-    console.error('Login error:', err);
-    if (err.message === 'INVALID_CREDENTIALS') {
-      return res.status(401).json({ error: 'Invalid credentials' });
+  } catch (error) {
+    console.error('Login error:', error);
+    if (error instanceof AppError) {
+      return res.status(error.statusCode).json({ error: error.message, statusCode: error.statusCode });
     }
-    return res.status(500).json({ error: 'Internal server error' });
+    return res.status(500).json({ error: 'Internal server error', statusCode: 500 });
   }
 };
 
@@ -44,7 +45,10 @@ export const getUsers = async (_req: Request, res: Response) => {
   try {
     const users = await getAllUsers();
     return res.json(users);
-  } catch (err) {
-    return res.status(500).json({ error: 'Failed to fetch users' });
+  } catch (error) {
+    if (error instanceof AppError) {
+      return res.status(error.statusCode).json({ error: error.message, statusCode: error.statusCode });
+    }
+    return res.status(500).json({ error: 'Failed to fetch users', statusCode: 500 });
   }
 };
