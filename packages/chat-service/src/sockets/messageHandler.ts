@@ -11,6 +11,7 @@ export interface MessageData {
 
 const handleMessageEvents = (io: Server, socket: Socket) => {
     const user = socket.data.user; // Authenticated user from socketAuth middleware
+    console.log("socket", socket.data)
 
     // Event: Client sends a direct message
     socket.on('send_message', async (data: { receiverId: string; content: string }) => {
@@ -20,9 +21,14 @@ const handleMessageEvents = (io: Server, socket: Socket) => {
             return;
         }
 
+        const token = socket.handshake.auth?.token;
+
         const response = await fetch('http://localhost:4003/api/messages', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}` 
+            },
             body: JSON.stringify({
                 senderId: user.id,
                 receiverId,
@@ -30,8 +36,10 @@ const handleMessageEvents = (io: Server, socket: Socket) => {
                 conversationId: getConversationId(user.id, receiverId),
             }),
         });
+        console.log('Message saved to database:', response);
 
         const savedMessage = await response.json();
+        console.log('Saved message:', savedMessage);
 
         const messagePayload: MessageData = {
             senderId: user.id,
