@@ -8,6 +8,10 @@ const messageService = {
   async getConversation(user1Id: string, user2Id: string) {
     return await messageRepo.getConversation(user1Id, user2Id);
   },
+
+  async getRecentConversations(userId: string) {
+    return await messageRepo.getRecentConversations(userId);
+  }
 };
 
 export default messageService;

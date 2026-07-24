@@ -36,10 +36,29 @@ export async function createMessage(senderId: string, receiverId: string, conten
 
 export async function getConversation(user1Id: string, user2Id: string) {
   const conversationId = getConversationId(user1Id, user2Id);
-  console.log("Fetching conversation for ID:", conversationId);
+  console.log("Fetching conversation for ID:==>", conversationId);
 
   return await prisma.message.findMany({
     where: { conversationId},
     orderBy: { createdAt: 'asc' },
+  });
+}
+
+export async function getRecentConversations(userId: string) {
+  // Finds all unique conversations where the user is either sender or receiver
+  // and returns the most recent message per conversationId.
+  console.log("Fetching recent conversations for userId:==>", userId);
+  return await prisma.message.findMany({
+    where: {
+      OR: [
+        { senderId: userId },
+        { receiverId: userId }
+      ]
+    },
+    orderBy: [
+      { conversationId: 'asc' },
+      { createdAt: 'desc' }
+    ],
+    distinct: ['conversationId']
   });
 }

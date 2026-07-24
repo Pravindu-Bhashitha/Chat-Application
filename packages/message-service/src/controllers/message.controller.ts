@@ -50,3 +50,35 @@ export const getConversationController = async (req: AuthenticatedRequest, res: 
     return res.status(500).json({ error: 'Failed to fetch conversation history', statusCode: 500 });
   }
 };
+
+export const getRecentConversationsController = async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    console.log("Fetching recent conversations for user:", userId);
+
+    if (!userId) {
+      return res.status(400).json({ error: 'User ID is required' });
+    }
+
+    const recentConversations = await messageService.getRecentConversations(userId);
+    console.log("Recent Conversations:==>", recentConversations);
+
+
+    const formattedConversations = recentConversations.map((m) => ({
+      id: m.id,
+      senderId: m.senderId,     // 👈 Add this
+      receiverId: m.receiverId, // 👈 Add this
+      conversationId: m.conversationId,
+      timestamp: m.createdAt.toISOString(),
+      content: m.content,
+    }));
+
+    res.json(formattedConversations);
+  } catch (error) {
+    console.error('Get recent conversations error:', error);
+    if(error instanceof AppError) {
+      return res.status(error.statusCode).json({ error: error.message, statusCode: error.statusCode });
+    }
+    return res.status(500).json({ error: 'Failed to fetch recent conversations', statusCode: 500 });
+  }
+};

@@ -68,6 +68,40 @@ const Dashboard = () => {
   }, [socket, fetchOnlineUsers]);
 
   useEffect(() => {
+  if (!currentUser?.id) return;
+
+  const loadInitialData = async () => {
+    try {
+      setLoading(true);
+      
+      // Fetch user list and last messages in parallel
+      const [allUsers, recentMsgs] = await Promise.all([
+        authService.getUsers(),
+        messageService.getRecentConversations()
+      ]);
+
+      setUsers(allUsers);
+
+      // Build a map of targetUserId -> latest Message
+      const lastMsgMap: Record<string, Message> = {};
+      recentMsgs.forEach((msg: Message) => {
+        const otherUserId = msg.senderId === currentUser.id ? msg.receiverId : msg.senderId;
+        lastMsgMap[otherUserId] = msg;
+      });
+      console.log("lastMsgMap", lastMsgMap);
+
+      setLastMessages(lastMsgMap);
+    } catch (err) {
+      setError('Failed to load user directory or messages.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  loadInitialData();
+}, [currentUser]);
+
+  useEffect(() => {
     if (!selectedUser) return;
 
     const fetchChatHistory = async () => {

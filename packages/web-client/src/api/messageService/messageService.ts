@@ -15,5 +15,13 @@ export const messageService = {
             throw new Error('Failed to save message');
         }
         return response.data;
+    },
+    getRecentConversations: async () => {
+        const response = await messageApi.get('/messages/recent');
+        console.log('Recent conversations fetched:', response);
+        if (!response) {
+            throw new Error('Failed to fetch recent conversations');
+        }
+        return response.data;
     }
 };
