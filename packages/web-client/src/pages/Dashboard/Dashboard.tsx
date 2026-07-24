@@ -140,7 +140,9 @@ const Dashboard = () => {
 
   const handleLogout = () => {
     localStorage.removeItem('token');
+    console.log('Token removed from localStorage');
     localStorage.removeItem('user');
+    console.log('User removed from localStorage');
     navigate('/login');
   };
 

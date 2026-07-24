@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Card, Form, Button, Alert, Container, Spinner } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
 import { authService } from '../../api/authService/authService';
+import { useAuth } from '../../context/AuthContext';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -11,6 +12,8 @@ const Login = () => {
 
   const navigate = useNavigate();
 
+  const { loginUser } = useAuth();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -18,9 +21,7 @@ const Login = () => {
 
     try {
       const { token, user } = await authService.login({ email, password });
-      localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(user));
-
+      loginUser(token, user);
       navigate('/');
     } catch (err: any) {
       console.error('Login error:', err);
