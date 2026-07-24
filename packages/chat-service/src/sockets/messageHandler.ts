@@ -1,10 +1,12 @@
 import { Server, Socket } from 'socket.io';
+import { getConversationId } from '../utils/conversationId';
 
 export interface MessageData {
     senderId: string;
     receiverId: string;
     content: string;
     timestamp?: string;
+    conversationId?: string;
 }
 
 const handleMessageEvents = (io: Server, socket: Socket) => {
@@ -25,6 +27,7 @@ const handleMessageEvents = (io: Server, socket: Socket) => {
                 senderId: user.id,
                 receiverId,
                 content,
+                conversationId: getConversationId(user.id, receiverId),
             }),
         });
 
@@ -34,6 +37,7 @@ const handleMessageEvents = (io: Server, socket: Socket) => {
             senderId: user.id,
             receiverId,
             content,
+            conversationId: getConversationId(user.id, receiverId),
             timestamp: savedMessage.createdAt || new Date().toISOString(),
         };
 

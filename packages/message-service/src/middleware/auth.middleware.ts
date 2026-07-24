@@ -17,7 +17,7 @@ const authenticateToken = (
 ) => {
     const authHeader = req.headers.authorization;
     if (!authHeader) {
-        return res.status(401).json({ error: 'Unauthorized: No token provided' });
+        return res.status(401).json({ error: 'Unauthorized: No token provided', statusCode: 401 });
     }
 
     const token = authHeader.split(' ')[1];
@@ -27,7 +27,7 @@ const authenticateToken = (
         req.user = decoded;
         next();
     } catch (err) {
-        return res.status(401).json({ error: 'Invalid or expired token' });
+        return res.status(401).json({ error: 'Invalid or expired token', statusCode: 401 });
     }
 };
 
