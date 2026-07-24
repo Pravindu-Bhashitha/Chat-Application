@@ -53,14 +53,11 @@
 //     });
 //   }
 // }
-import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { LoginUserData, RegisterUserData } from '../types/user';
 import * as authRepo from '../repository/auth.repository';
 import { AppError } from '../utils/AppError';
-
-// const prisma = new PrismaClient();
 
 export async function registerUser(data: RegisterUserData) {
   const existingUser = await authRepo.findUserByEmail(data.email) || await authRepo.findUserByUsername(data.username); 

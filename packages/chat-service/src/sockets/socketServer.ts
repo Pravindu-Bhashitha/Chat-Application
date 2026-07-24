@@ -10,13 +10,13 @@ dotenv.config();
 const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN || '';
 
 const initSocketServer = (server: http.Server): Server => {
-    const io = new Server(server, {
+  const io = new Server(server, {
     cors: {
       origin: CLIENT_ORIGIN,
       methods: ['GET', 'POST'],
     },
   });
-  // Attach auth middleware
+  
   io.use(socketAuthMiddleware);
 
   // Attach connection handlers
@@ -26,7 +26,6 @@ const initSocketServer = (server: http.Server): Server => {
     socket.join(userId);
     handlePresenceEvents(io, socket);
     handleMessageEvents(io, socket);
-    // Future handlers (e.g., handleMessageEvents) will go here!
   });
 
   return io;

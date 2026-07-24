@@ -1,11 +1,7 @@
 import { Socket } from 'socket.io';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
-
-export interface DecodedToken {
-  id: string;
-  username?: string;
-}
+import { DecodedToken } from '../types';
 
 dotenv.config();
 const JWT_SECRET = process.env.JWT_SECRET || 'supersecretkey';

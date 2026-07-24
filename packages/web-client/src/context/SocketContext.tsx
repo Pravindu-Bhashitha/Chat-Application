@@ -26,8 +26,8 @@ const SocketContext = createContext<SocketContextType>({
   socket: null,
   onlineUserIds: [],
   presences: {},
-  updateStatus: () => {},
-  fetchOnlineUsers: () => {},
+  updateStatus: () => { },
+  fetchOnlineUsers: () => { },
 });
 export const useSocket = () => useContext(SocketContext);
 
@@ -66,14 +66,6 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       setOnlineUserIds(users);
     });
 
-    // Listen for real-time online status changes
-    // newSocket.on('user_online', ({ onlineUsers }: { onlineUsers: string[] }) => {
-    //   setOnlineUserIds(onlineUsers);
-    // });
-
-    // newSocket.on('user_offline', ({ onlineUsers }: { onlineUsers: string[] }) => {
-    //   setOnlineUserIds(onlineUsers);
-    // });
     // Listen for initial full presences map
     newSocket.on('get_all_presences', (presencesData: Record<string, UserPresence>) => {
       setPresences(presencesData);
@@ -101,7 +93,7 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       setOnlineUserIds(data.onlineUsers);
       if (data.presences) setPresences(data.presences);
     });
-    
+
     setSocket(newSocket);
 
     // Cleanup connection on unmount / logout
@@ -127,12 +119,12 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   return (
     <SocketContext.Provider value={{
-        socket,
-        onlineUserIds,
-        presences,
-        updateStatus,
-        fetchOnlineUsers,
-      }}>
+      socket,
+      onlineUserIds,
+      presences,
+      updateStatus,
+      fetchOnlineUsers,
+    }}>
       {children}
     </SocketContext.Provider>
   );

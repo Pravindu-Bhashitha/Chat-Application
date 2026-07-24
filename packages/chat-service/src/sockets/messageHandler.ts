@@ -39,8 +39,6 @@ const handleMessageEvents = (io: Server, socket: Socket) => {
 
         console.log(`📩 Message from ${user.username} to ${receiverId}: "${content}"`);
 
-        // Broadcast message to the intended recipient and echo back to sender
-        // Note: If users are joined in rooms by their userId, we can emit directly to their room!
         io.to(receiverId).emit('receive_message', messagePayload);
         socket.emit('receive_message', messagePayload);
     });

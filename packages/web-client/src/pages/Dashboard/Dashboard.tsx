@@ -106,23 +106,23 @@ const Dashboard = () => {
     };
   }, [socket]);
 
-  useEffect(() => {
-    if (!selectedUser) return;
+  // useEffect(() => {
+  //   if (!selectedUser) return;
 
-    const fetchChatHistory = async () => {
-      try {
-        const response = await messageService.getConversation(selectedUser.id);
+  //   const fetchChatHistory = async () => {
+  //     try {
+  //       const response = await messageService.getConversation(selectedUser.id);
 
-        if (response) {
-          setMessages(response);
-        }
-      } catch (err) {
-        console.error('Failed to load message history:', err);
-      }
-    };
+  //       if (response) {
+  //         setMessages(response);
+  //       }
+  //     } catch (err) {
+  //       console.error('Failed to load message history:', err);
+  //     }
+  //   };
 
-    fetchChatHistory();
-  }, [selectedUser]);
+  //   fetchChatHistory();
+  // }, [selectedUser]);
 
   // Send Message Handler
   const handleSendMessage = (e: React.FormEvent) => {
@@ -152,13 +152,12 @@ const Dashboard = () => {
       <Container fluid className="flex-grow-1 d-flex flex-column pb-3 overflow-hidden">
         <Row className="flex-grow-1 g-0 shadow-sm rounded border bg-white overflow-hidden">
           {/* User Directory Sidebar */}
-         <Col
+          <Col
             xs={12}
             md={4}
             lg={3}
-            className={`d-flex flex-column h-100 border-end ${
-              selectedUser ? 'd-none d-md-flex' : 'd-flex'
-            }`}
+            className={`d-flex flex-column h-100 border-end ${selectedUser ? 'd-none d-md-flex' : 'd-flex'
+              }`}
           >
             <UserList
               users={users}
@@ -178,9 +177,8 @@ const Dashboard = () => {
             xs={12}
             md={8}
             lg={9}
-            className={`d-flex flex-column h-100 ${
-              !selectedUser ? 'd-none d-md-flex' : 'd-flex'
-            }`}
+            className={`d-flex flex-column h-100 ${!selectedUser ? 'd-none d-md-flex' : 'd-flex'
+              }`}
           >
             <ChatArea
               selectedUser={selectedUser}

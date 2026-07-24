@@ -1,20 +1,24 @@
 import { Request, Response } from 'express';
 import { AuthenticatedRequest } from '../middleware/auth.middleware';
 import messageService from '../services/message.service';
+import { AppError } from '../utils/AppError';
 
 export const saveMessageController = async (req: Request, res: Response) => {
   try {
     const { senderId, receiverId, content } = req.body;
 
     if (!senderId || !receiverId || !content) {
-      return res.status(400).json({ error: 'Missing required fields' });
+      return res.status(400).json({ error: 'Missing required fields',statusCode: 400 });
     }
 
     const message = await messageService.createMessage(senderId, receiverId, content);
     res.status(201).json(message);
-  } catch (err) {
-    console.error('Save message error:', err);
-    res.status(500).json({ error: 'Failed to save message' });
+  } catch (error) {
+    if (error instanceof AppError) {
+      return res.status(error.statusCode).json({ error: error.message, statusCode: error.statusCode });
+    }
+    console.error('Save message error:', error);
+    return res.status(500).json({ error: 'Failed to save message',statusCode: 500});
   }
 };
 
@@ -38,8 +42,11 @@ export const getConversationController = async (req: AuthenticatedRequest, res: 
     }));
 
     res.json(formattedMessages);
-  } catch (err) {
-    console.error('Get conversation error:', err);
-    res.status(500).json({ error: 'Failed to fetch conversation history' });
+  } catch (error) {
+    console.error('Get conversation error:', error);
+    if (error instanceof AppError) {
+      return res.status(error.statusCode).json({ error: error.message, statusCode: error.statusCode });
+    }
+    return res.status(500).json({ error: 'Failed to fetch conversation history', statusCode: 500 });
   }
 };
