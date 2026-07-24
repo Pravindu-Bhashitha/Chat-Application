@@ -9,6 +9,7 @@ import { Message } from '../../types';
 import UserList from '../../components/UserList/UserList';
 import ChatArea from '../../components/ChatArea/ChatArea';
 import { messageService } from '../../api/messageService/messageService';
+import { useAuth } from '../../context/AuthContext';
 
 interface User {
   id: string;
@@ -19,8 +20,9 @@ interface User {
 const Dashboard = () => {
   const navigate = useNavigate();
   // const { socket, onlineUserIds, fetchOnlineUsers } = useSocket();
-  const { socket, onlineUserIds, presences, fetchOnlineUsers } = useSocket();
-  console.log("onlineUserIds", onlineUserIds);
+  const { socket, onlineUserIds, presences, fetchOnlineUsers, disconnectSocket } = useSocket();
+  const {logoutUser} = useAuth();
+  // console.log("onlineUserIds", onlineUserIds);
 
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [users, setUsers] = useState<User[]>([]);
@@ -139,6 +141,8 @@ const Dashboard = () => {
 
 
   const handleLogout = () => {
+    disconnectSocket(); // Disconnect the socket when logging out
+    logoutUser();
     localStorage.removeItem('token');
     console.log('Token removed from localStorage');
     localStorage.removeItem('user');

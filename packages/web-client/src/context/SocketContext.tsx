@@ -1,5 +1,6 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
+import { useAuth } from './AuthContext';
 
 export type StatusType = 'Available' | 'Away' | 'Busy' | 'Offline';
 
@@ -20,6 +21,7 @@ interface SocketContextType {
   presences: Record<string, UserPresence>;
   updateStatus: (status: StatusType, customNote?: string) => void;
   fetchOnlineUsers: () => void;
+  disconnectSocket: () => void;
 }
 
 const SocketContext = createContext<SocketContextType>({
@@ -28,6 +30,7 @@ const SocketContext = createContext<SocketContextType>({
   presences: {},
   updateStatus: () => { },
   fetchOnlineUsers: () => { },
+  disconnectSocket: () => { },
 });
 export const useSocket = () => useContext(SocketContext);
 
@@ -36,16 +39,29 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [onlineUserIds, setOnlineUserIds] = useState<string[]>([]);
   const [presences, setPresences] = useState<Record<string, UserPresence>>({});
 
-  const token = localStorage.getItem('token');
+  // const token = localStorage.getItem('token');
+  // 1. Listen to React Auth State instead of raw localStorage variable
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
-
+    // Read the current token dynamically when auth state changes
+    const token = localStorage.getItem('token');
     // if (!token) return;
-    if (!token) {
+    // if (!token) {
+    //   if (socket) {
+    //     socket.disconnect();
+    //     setSocket(null);
+    //   }
+    //   return;
+    // }
+    // If not authenticated or token missing, disconnect any active socket and reset state
+    if (!isAuthenticated || !token) {
       if (socket) {
         socket.disconnect();
         setSocket(null);
       }
+      setOnlineUserIds([]);
+      setPresences({});
       return;
     }
 
@@ -100,7 +116,7 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     return () => {
       newSocket.disconnect();
     };
-  }, [token]);
+  }, [isAuthenticated]);
 
   const updateStatus = useCallback(
     (status: StatusType, customNote?: string) => {
@@ -117,6 +133,18 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
   }, [socket]);
 
+  const disconnectSocket = useCallback(() => {
+    if (socket) {
+      // 1. Tell backend explicitly so it broadcasts immediately to other browsers
+      socket.emit('user_logout');
+      // 2. Safely close socket connection
+      socket.disconnect();
+      setSocket(null);
+    }
+    setOnlineUserIds([]);
+    setPresences({});
+  }, [socket]);
+
   return (
     <SocketContext.Provider value={{
       socket,
@@ -124,6 +152,7 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       presences,
       updateStatus,
       fetchOnlineUsers,
+      disconnectSocket,
     }}>
       {children}
     </SocketContext.Provider>
