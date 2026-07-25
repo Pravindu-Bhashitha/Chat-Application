@@ -27,7 +27,7 @@ const handleMessageEvents = (io: Server, socket: Socket) => {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}` 
+                'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify({
                 senderId: user.id,
@@ -36,7 +36,6 @@ const handleMessageEvents = (io: Server, socket: Socket) => {
                 conversationId: getConversationId(user.id, receiverId),
             }),
         });
-        console.log('Message saved to database:', response);
 
         const savedMessage = await response.json();
         console.log('Saved message:', savedMessage);
@@ -53,6 +52,17 @@ const handleMessageEvents = (io: Server, socket: Socket) => {
 
         io.to(receiverId).emit('receive_message', messagePayload);
         socket.emit('receive_message', messagePayload);
+    });
+    socket.on('mark_as_read', ({ senderId }: { senderId: string }) => {
+        console.log(`👁️ User ${user.id} is marking messages from ${senderId} as read`);
+        if (!senderId) return;
+
+        console.log(`👁️ User ${user.id} read messages sent by ${senderId}`);
+
+        // Notify the original sender that this user (`user.id`) has read their messages
+        io.to(senderId).emit('messages_read', {
+            readByUserId: user.id,
+        });
     });
 };
 

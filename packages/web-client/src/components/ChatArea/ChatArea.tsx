@@ -5,6 +5,7 @@ import CustomButton from '../CustomButton/CustomButton';
 // import { messageService } from '../../api/messageService/messageService';
 import { StatusType } from '../../context/SocketContext';
 import { getStatusColor } from '../../utils/statusColor';
+import { MessageStatus } from '../../utils/messageStatus';
 
 interface ChatAreaProps {
     selectedUser: User | null;
@@ -87,24 +88,42 @@ const ChatArea = ({
                 ) : (
                     activeChatMessages.map((msg, index) => {
                         const isMe = msg.senderId === currentUserId;
+
                         return (
                             <div
-                                key={index}
-                                className={`d-flex flex-column ${isMe ? 'align-items-end' : 'align-items-start'}`}
+                                key={msg.id || index}
+                                className={`d-flex flex-column ${isMe ? 'align-items-end' : 'align-items-start'
+                                    }`}
                             >
                                 <div
-                                    className={`p-3 rounded-3 shadow-sm ${isMe ? 'bg-primary text-white' : 'bg-white text-dark'
+                                    className={`px-3 py-2 rounded-3 shadow-sm ${isMe ? 'bg-primary text-white' : 'bg-white text-dark border'
                                         }`}
-                                    style={{ maxWidth: '70%', wordBreak: 'break-word' }}
+                                    style={{
+                                        maxWidth: '70%',
+                                        wordBreak: 'break-word',
+                                        position: 'relative',
+                                    }}
                                 >
-                                    {msg.content}
+                                    {/* Message Content */}
+                                    <div>{msg.content}</div>
+
+                                    {/* Timestamp & Status Ticks Row */}
+                                    <div
+                                        className={`d-flex align-items-center justify-content-end gap-1 mt-1 ${isMe ? 'text-white-50' : 'text-muted'
+                                            }`}
+                                        style={{ fontSize: '0.68rem' }}
+                                    >
+                                        <span>
+                                            {new Date(msg.timestamp).toLocaleTimeString([], {
+                                                hour: '2-digit',
+                                                minute: '2-digit',
+                                            })}
+                                        </span>
+
+                                        {/* 🟢 Render Ticks for Sent Messages */}
+                                        {isMe && <MessageStatus isRead={msg.isRead} />}
+                                    </div>
                                 </div>
-                                <small className="text-muted mt-1 px-1" style={{ fontSize: '0.7rem' }}>
-                                    {new Date(msg.timestamp).toLocaleTimeString([], {
-                                        hour: '2-digit',
-                                        minute: '2-digit',
-                                    })}
-                                </small>
                             </div>
                         );
                     })
@@ -125,7 +144,7 @@ const ChatArea = ({
                             type="submit"
                             className="rounded-end-pill px-4"
                             loading={false}
-                            // onClick={sendMessage}
+                        // onClick={sendMessage}
                         >
                             Send
                         </CustomButton>
