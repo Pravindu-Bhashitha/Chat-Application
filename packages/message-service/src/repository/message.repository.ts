@@ -29,7 +29,7 @@ export async function createMessage(senderId: string, receiverId: string, conten
       senderId,
       receiverId,
       conversationId,
-      content,
+      content
     },
   });
 }
@@ -45,8 +45,6 @@ export async function getConversation(user1Id: string, user2Id: string) {
 }
 
 export async function getRecentConversations(userId: string) {
-  // Finds all unique conversations where the user is either sender or receiver
-  // and returns the most recent message per conversationId.
   console.log("Fetching recent conversations for userId:==>", userId);
   return await prisma.message.findMany({
     where: {
@@ -60,5 +58,32 @@ export async function getRecentConversations(userId: string) {
       { createdAt: 'desc' }
     ],
     distinct: ['conversationId']
+  });
+}
+
+export async function markAsRead(senderId: string, receiverId: string) {
+  return await prisma.message.updateMany({
+    where: {
+      senderId: senderId,
+      receiverId: receiverId,
+      isRead: false,
+    },
+    data: {
+      isRead: true,
+      readAt: new Date(),
+    },
+  });
+}
+
+export async function getUnreadCountsBySender(receiverId: string) {
+  return await prisma.message.groupBy({
+    by: ['senderId'],
+    where: {
+      receiverId: receiverId,
+      isRead: false,
+    },
+    _count: {
+      id: true,
+    },
   });
 }

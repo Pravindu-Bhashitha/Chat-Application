@@ -14,6 +14,7 @@ interface UserListProps {
     onSelectUser: (user: User) => void;
     lastMessages?: Record<string, Message>;
     presences: Record<string, { status: StatusType; customNote?: string }>;
+    unreadCounts: Record<string, number>;
 }
 
 const UserList = ({
@@ -25,7 +26,8 @@ const UserList = ({
     error,
     onSelectUser,
     lastMessages = {},
-    presences
+    presences,
+    unreadCounts,
 }: UserListProps) => {
     if (loading) {
         // return (
@@ -57,8 +59,8 @@ const UserList = ({
                         const isOnline = onlineUserIds.includes(user.id);
                         const isSelected = selectedUserId === user.id;
                         const lastMsg = lastMessages[user.id];
-
                         const status = presences[user.id]?.status || 'Offline';
+                        const unreadCount = unreadCounts[user.id] || 0;
 
                         return (
                             <div
@@ -78,6 +80,7 @@ const UserList = ({
                                     timestamp={lastMsg?.timestamp || lastMsg?.timestamp}
                                     onSelect={() => onSelectUser(user)}
                                     status={status}
+                                    unreadCount={unreadCount}
                                 />
                             </div>
                         );

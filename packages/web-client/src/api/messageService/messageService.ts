@@ -23,5 +23,17 @@ export const messageService = {
             throw new Error('Failed to fetch recent conversations');
         }
         return response.data;
-    }
+    },
+    // 🆕 Fetch unread message counts
+    getUnreadCounts: async () => {
+        const response = await messageApi.get('/messages/unread-counts');
+        console.log('Unread counts fetched:', response);
+        return response.data; // Returns { [senderId]: number }
+    },
+
+    // 🆕 Mark messages from a specific user as read
+    markAsRead: async (senderId: string) => {
+        const response = await messageApi.patch(`/messages/read/${senderId}`);
+        return response.data;
+    },
 };

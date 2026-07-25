@@ -29,6 +29,10 @@ const Dashboard = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState('');
   const [lastMessages, setLastMessages] = useState<Record<string, Message>>({});
+  console.log('Last messages state:', lastMessages);
+
+  const [unreadCounts, setUnreadCounts] = useState<Record<string, number>>({});
+  console.log('Unread counts state:', unreadCounts);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -63,12 +67,19 @@ const Dashboard = () => {
 
         // Map targetUserId -> latest Message preview
         const lastMsgMap: Record<string, Message> = {};
-        recentMsgs.forEach((msg: Message) => {
+        const unreadMap: Record<string, number> = {};
+
+        recentMsgs.forEach((msg: Message & { unreadCount?: number }) => {
           const otherUserId = msg.senderId === currentUser.id ? msg.receiverId : msg.senderId;
           lastMsgMap[otherUserId] = msg;
+
+          if (!msg.isRead && msg.senderId !== currentUser.id) {
+            unreadMap[otherUserId] = (unreadMap[otherUserId] || 0) + 1;
+          }
         });
 
         setLastMessages(lastMsgMap);
+        setUnreadCounts(unreadMap);
       } catch (err) {
         setError('Failed to load user directory or message previews.');
       } finally {
@@ -87,15 +98,39 @@ const Dashboard = () => {
   }, [socket, fetchOnlineUsers]);
 
   // 4. Fetch Selected User Chat History
+  // useEffect(() => {
+  //   if (!selectedUser) return;
+
+  //   const fetchChatHistory = async () => {
+  //     try {
+  //       const history = await messageService.getConversation(selectedUser.id);
+  //       if (history) {
+  //         setMessages(history);
+  //       }
+  //     } catch (err) {
+  //       console.error('Failed to load message history:', err);
+  //     }
+  //   };
+
+  //   fetchChatHistory();
+  // }, [selectedUser]);
+  // 4. Fetch Selected User Chat History & Clear Unread Count
   useEffect(() => {
     if (!selectedUser) return;
 
     const fetchChatHistory = async () => {
       try {
         const history = await messageService.getConversation(selectedUser.id);
+        console.log('Fetched chat history:', history);
         if (history) {
           setMessages(history);
         }
+
+        // 🔴 Clear unread counter when opening chat window
+        setUnreadCounts((prev) => ({
+          ...prev,
+          [selectedUser.id]: 0,
+        }));
       } catch (err) {
         console.error('Failed to load message history:', err);
       }
@@ -105,22 +140,64 @@ const Dashboard = () => {
   }, [selectedUser]);
 
   // 5. Real-Time Incoming Message Listener (Updates Active Chat + Previews Live)
+  // useEffect(() => {
+  //   if (!socket || !currentUser?.id) return;
+
+  //   const handleReceiveMessage = (newMessage: Message) => {
+  //     // Append to active chat if sender/receiver matches selected user
+  //     setMessages((prev) => [...prev, newMessage]);
+
+  //     // Dynamically update the lastMessage preview for sidebar
+  //     const otherUserId = newMessage.senderId === currentUser.id 
+  //       ? newMessage.receiverId 
+  //       : newMessage.senderId;
+
+  //     setLastMessages((prev) => ({
+  //       ...prev,
+  //       [otherUserId]: newMessage,
+  //     }));
+  //   };
+
+  //   socket.on('receive_message', handleReceiveMessage);
+
+  //   return () => {
+  //     socket.off('receive_message', handleReceiveMessage);
+  //   };
+  // }, [socket, currentUser]);
+  // 5. Real-Time Incoming Message Listener
   useEffect(() => {
     if (!socket || !currentUser?.id) return;
 
     const handleReceiveMessage = (newMessage: Message) => {
-      // Append to active chat if sender/receiver matches selected user
-      setMessages((prev) => [...prev, newMessage]);
+      const otherUserId =
+        newMessage.senderId === currentUser.id
+          ? newMessage.receiverId
+          : newMessage.senderId;
+
+      // Only append to active messages stream if sender or receiver matches current selected user
+      setMessages((prev) => {
+        if (
+          selectedUser &&
+          (newMessage.senderId === selectedUser.id || newMessage.receiverId === selectedUser.id)
+        ) {
+          return [...prev, newMessage];
+        }
+        return prev;
+      });
 
       // Dynamically update the lastMessage preview for sidebar
-      const otherUserId = newMessage.senderId === currentUser.id 
-        ? newMessage.receiverId 
-        : newMessage.senderId;
-
       setLastMessages((prev) => ({
         ...prev,
         [otherUserId]: newMessage,
       }));
+
+      // 🔴 Increment unread count if message is from someone else and NOT the active open chat
+      if (newMessage.senderId !== currentUser.id && selectedUser?.id !== newMessage.senderId) {
+        setUnreadCounts((prev) => ({
+          ...prev,
+          [newMessage.senderId]: (prev[newMessage.senderId] || 0) + 1,
+        }));
+      }
     };
 
     socket.on('receive_message', handleReceiveMessage);
@@ -128,7 +205,7 @@ const Dashboard = () => {
     return () => {
       socket.off('receive_message', handleReceiveMessage);
     };
-  }, [socket, currentUser]);
+  }, [socket, currentUser, selectedUser]);
 
   // Send Message Handler
   const handleSendMessage = (e: React.FormEvent) => {
@@ -141,6 +218,15 @@ const Dashboard = () => {
     });
 
     setInputMessage('');
+  };
+
+  const handleSelectUser = (user: User) => {
+    setSelectedUser(user);
+    // Clear unread count immediately upon clicking user
+    setUnreadCounts((prev) => ({
+      ...prev,
+      [user.id]: 0,
+    }));
   };
 
 
@@ -175,8 +261,10 @@ const Dashboard = () => {
               lastMessages={lastMessages}
               loading={loading}
               error={error}
-              onSelectUser={(user) => setSelectedUser(user)}
+              // onSelectUser={(user) => setSelectedUser(user)}
+              onSelectUser={handleSelectUser}
               presences={presences}
+              unreadCounts={unreadCounts}
             />
           </Col>
 
