@@ -30,7 +30,7 @@ export async function findById(userId: string) {
 
 export async function updateProfile(
     userId: string,
-    data: { username?: string; status?: string; }
+    data: { username?: string; email?: string }
 ) {
     return await prisma.user.update({
         where: { id: userId },
@@ -38,8 +38,25 @@ export async function updateProfile(
         select: {
             id: true,
             username: true,
+            email: true
+        },
+    });
+}
+
+export async function findByUsernameOrEmail(username?: string, email?: string) {
+    if (!username && !email) return [];
+
+    return await prisma.user.findMany({
+        where: {
+            OR: [
+                ...(username ? [{ username }] : []),
+                ...(email ? [{ email }] : []),
+            ],
+        },
+        select: {
+            id: true,
+            username: true,
             email: true,
-            updatedAt: true,
         },
     });
 }

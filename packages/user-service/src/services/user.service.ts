@@ -1,4 +1,5 @@
 import * as userRepo from '../repository/user.repository';
+import { UpdateUserProfileData } from '../types/UpdateProfile';
 import { AppError } from '../utils/AppError';
 
 const userService = {
@@ -24,7 +25,7 @@ const userService = {
 
   async updateUserProfile(
     userId: string,
-    updateData: { username?: string; status?: string; avatarUrl?: string }
+    updateData: UpdateUserProfileData
   ) {
     if (!userId) {
       throw new AppError('User ID is required.', 400);
@@ -35,11 +36,31 @@ const userService = {
       throw new AppError('User not found.', 404);
     }
 
-    // Prepare cleaned payload
-    const payloadToUpdate: Record<string, string> = {};
-    if (updateData.username?.trim()) {
-      payloadToUpdate.username = updateData.username.trim();
+    const cleanUsername = updateData.username?.trim();
+    const cleanEmail = updateData.email?.trim();
+
+    const isUsernameChanged = cleanUsername && cleanUsername !== existingUser.username;
+    const isEmailChanged = cleanEmail && cleanEmail !== existingUser.email;
+
+    const conflictingUsers = await userRepo.findByUsernameOrEmail(
+      isUsernameChanged ? cleanUsername : undefined,
+      isEmailChanged ? cleanEmail : undefined
+    );
+
+    for (const conflict of conflictingUsers) {
+      if (conflict.id !== userId) {
+        if (isUsernameChanged && conflict.username === cleanUsername) {
+          throw new AppError('Username is already taken.', 409);
+        }
+        if (isEmailChanged && conflict.email === cleanEmail) {
+          throw new AppError('Email is already in use.', 409);
+        }
+      }
     }
+
+    const payloadToUpdate: Record<string, string> = {};
+    if (isUsernameChanged) payloadToUpdate.username = cleanUsername!;
+    if (isEmailChanged) payloadToUpdate.email = cleanEmail!;
 
     return await userRepo.updateProfile(userId, payloadToUpdate);
   },
