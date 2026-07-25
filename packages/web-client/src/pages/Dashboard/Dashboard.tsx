@@ -126,6 +126,8 @@ const Dashboard = () => {
           setMessages(history);
         }
 
+        await messageService.markAsRead(selectedUser.id);
+
         // 🔴 Clear unread counter when opening chat window
         setUnreadCounts((prev) => ({
           ...prev,
@@ -180,6 +182,7 @@ const Dashboard = () => {
           selectedUser &&
           (newMessage.senderId === selectedUser.id || newMessage.receiverId === selectedUser.id)
         ) {
+          messageService.markAsRead(newMessage.senderId).catch(console.error);
           return [...prev, newMessage];
         }
         return prev;
