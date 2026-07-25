@@ -46,10 +46,12 @@ export const updateMyProfile = async (req: AuthenticatedRequest, res: Response) 
       return res.status(401).json({ error: 'Unauthorized: User ID not found in token', statusCode: 401 });
     }
     const { username, email } = req.body;
+    console.log('Updating profile for userId:', userId, 'with data:', { username, email });
 
     const updatedProfile = await userService.updateUserProfile(userId, {
       username, email
     });
+    console.log('Profile updated successfully for userId:', userId, 'Updated data:', updatedProfile);
 
     return res.status(200).json(updatedProfile);
   } catch (error) {

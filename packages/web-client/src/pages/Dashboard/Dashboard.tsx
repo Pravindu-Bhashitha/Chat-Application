@@ -199,6 +199,16 @@ const Dashboard = () => {
     }));
   };
 
+  const handleUpdateUser = async (userData: Partial<User>) => {
+    if (!currentUser) throw new Error("No current user");
+
+    const updatedUser = await userService.updateUser(userData);
+
+    localStorage.setItem("user", JSON.stringify(updatedUser));
+    setCurrentUser(updatedUser);
+
+    return updatedUser;
+  };
 
   const handleLogout = () => {
     disconnectSocket();
@@ -211,7 +221,7 @@ const Dashboard = () => {
   return (
 
     <div className="d-flex flex-column vh-100 bg-light">
-      <Header username={currentUser?.username} onLogout={handleLogout} />
+      <Header username={currentUser?.username} email={currentUser?.email} onLogout={handleLogout} onUpdateUser={handleUpdateUser} />
       <Container fluid className="flex-grow-1 d-flex flex-column pb-3 overflow-hidden">
         <Row className="flex-grow-1 g-0 shadow-sm rounded border bg-white overflow-hidden">
           {/* User Directory Sidebar */}
