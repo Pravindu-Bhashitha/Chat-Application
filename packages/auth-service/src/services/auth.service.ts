@@ -46,6 +46,6 @@ export async function loginUser(data: LoginUserData) {
   };
 }
 
-export async function getAllUsers() {
-  return await authRepo.findAllUsers();
-}
+// export async function getAllUsers() {
+//   return await authRepo.findAllUsers();
+// }

@@ -3,19 +3,13 @@ import { Container, Row, Col } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import Header from '../../components/Header.tsx/Header';
 import Footer from '../../components/Footer/Footer';
-import { authService } from '../../api/authService/authService';
+import { userService } from '../../api/userService/userService';
 import { useSocket } from '../../context/SocketContext';
-import { Message } from '../../types';
+import { Message, User } from '../../types';
 import UserList from '../../components/UserList/UserList';
 import ChatArea from '../../components/ChatArea/ChatArea';
 import { messageService } from '../../api/messageService/messageService';
 import { useAuth } from '../../context/AuthContext';
-
-interface User {
-  id: string;
-  username: string;
-  email: string;
-}
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -59,7 +53,7 @@ const Dashboard = () => {
         setLoading(true);
 
         const [allUsers, recentMsgs] = await Promise.all([
-          authService.getUsers(),
+          userService.getUsers(),
           messageService.getRecentConversations()
         ]);
 

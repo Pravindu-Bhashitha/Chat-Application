@@ -1,0 +1,30 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id        String   @id @default(uuid())
+  username  String   @unique
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+}
+
+model Message {
+  id         String   @id @default(uuid())
+  senderId   String
+  receiverId String
+  conversationId String
+  content    String
+  isRead         Boolean  @default(false)
+  readAt         DateTime?
+  createdAt  DateTime @default(now())
+
+  @@index([conversationId, createdAt])
+  @@index([receiverId, isRead])
+}

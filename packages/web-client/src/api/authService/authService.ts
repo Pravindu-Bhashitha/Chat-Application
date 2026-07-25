@@ -12,8 +12,8 @@ export const authService = {
     return response.data;
   },
 
-  getUsers: async (): Promise<User[]> => {
-    const response = await authApi.get<User[]>('/auth/users');
-    return response.data;
-  },
+  // getUsers: async (): Promise<User[]> => {
+  //   const response = await authApi.get<User[]>('/auth/users');
+  //   return response.data;
+  // },
 };
