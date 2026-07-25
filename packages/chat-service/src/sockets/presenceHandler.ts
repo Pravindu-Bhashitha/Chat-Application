@@ -19,7 +19,6 @@ const handlePresenceEvents = (io: Server, socket: Socket) => {
   if (!userPresenceMap.has(user.id)) {
     userPresenceMap.set(user.id, { status: 'Available' });
   } else {
-    // If reconnecting, set back to Available
     const current = userPresenceMap.get(user.id)!;
     current.status = 'Available';
   }

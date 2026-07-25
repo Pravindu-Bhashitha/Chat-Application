@@ -2,7 +2,6 @@ import { Request, Response } from 'express';
 import { AuthenticatedRequest } from '../middleware/auth.middleware';
 import messageService from '../services/message.service';
 import { AppError } from '../utils/AppError';
-import { stat } from 'fs';
 
 export const saveMessageController = async (req: Request, res: Response) => {
   try {
@@ -97,8 +96,8 @@ export const getRecentConversationsController = async (req: AuthenticatedRequest
 
 export const markMessagesAsRead = async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const userId = req.user?.id; // Logged-in user (Receiver)
-    const { senderId } = req.params;     // Active chat user (Sender)
+    const userId = req.user?.id; 
+    const { senderId } = req.params;  
 
     if (!userId || !senderId) {
       return res.status(400).json({ error: 'User ID is required', statusCode: 400 });

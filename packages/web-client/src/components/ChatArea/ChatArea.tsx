@@ -2,7 +2,6 @@ import React, { useRef, useEffect } from 'react';
 import { Button, Form, InputGroup } from 'react-bootstrap';
 import { Message, User } from '../../types';
 import CustomButton from '../CustomButton/CustomButton';
-// import { messageService } from '../../api/messageService/messageService';
 import { StatusType } from '../../context/SocketContext';
 import { getStatusColor } from '../../utils/statusColor';
 import { MessageStatus } from '../../utils/messageStatus';
@@ -52,11 +51,6 @@ const ChatArea = ({
             (msg.senderId === selectedUser.id && msg.receiverId === currentUserId)
     );
 
-    // const sendMessage = async () => {
-    //     const response = messageService.saveConversation(currentUserId || '', selectedUser.id, inputMessage);
-    //     console.log('Message sent:', response);
-    // }
-
     return (
         <div className="d-flex flex-column h-100 bg-light overflow-hidden">
             <div className="bg-white border-bottom p-3 d-flex align-items-center gap-2 shadow-sm flex-shrink-0">
@@ -104,10 +98,7 @@ const ChatArea = ({
                                         position: 'relative',
                                     }}
                                 >
-                                    {/* Message Content */}
                                     <div>{msg.content}</div>
-
-                                    {/* Timestamp & Status Ticks Row */}
                                     <div
                                         className={`d-flex align-items-center justify-content-end gap-1 mt-1 ${isMe ? 'text-white-50' : 'text-muted'
                                             }`}
@@ -120,7 +111,6 @@ const ChatArea = ({
                                             })}
                                         </span>
 
-                                        {/* 🟢 Render Ticks for Sent Messages */}
                                         {isMe && <MessageStatus isRead={msg.isRead} />}
                                     </div>
                                 </div>
@@ -144,7 +134,6 @@ const ChatArea = ({
                             type="submit"
                             className="rounded-end-pill px-4"
                             loading={false}
-                        // onClick={sendMessage}
                         >
                             Send
                         </CustomButton>

@@ -5,5 +5,5 @@ export interface Message {
   content: string;
   timestamp: string;
   isRead: boolean;
-  unreadCount?: number; // Optional property to track unread messages
+  unreadCount?: number; 
 }

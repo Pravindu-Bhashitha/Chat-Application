@@ -24,14 +24,13 @@ export const messageService = {
         }
         return response.data;
     },
-    // 🆕 Fetch unread message counts
+
     getUnreadCounts: async () => {
         const response = await messageApi.get('/messages/unread-counts');
         console.log('Unread counts fetched:', response);
-        return response.data; // Returns { [senderId]: number }
+        return response.data; 
     },
 
-    // 🆕 Mark messages from a specific user as read
     markAsRead: async (senderId: string) => {
         const response = await messageApi.patch(`/messages/read/${senderId}`);
         return response.data;

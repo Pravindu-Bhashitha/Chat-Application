@@ -1,7 +1,6 @@
 import { LoginPayload, LoginResponse, RegisterPayload, User } from '../../types';
 import { authApi } from '../axiosInstance';
 
-
 export const authService = {
   register: async (data: RegisterPayload): Promise<User> => {
     const response = await authApi.post<User>('/auth/register', data);

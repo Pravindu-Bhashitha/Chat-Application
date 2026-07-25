@@ -13,6 +13,7 @@ router.get('/recent', authenticateToken, getRecentConversationsController);
 router.get('/:otherUserId', authenticateToken, getConversationController);
 
 router.get('/unread-counts', authenticateToken, getUnreadCounts);
+
 router.patch('/read/:senderId', authenticateToken, markMessagesAsRead);
 
 

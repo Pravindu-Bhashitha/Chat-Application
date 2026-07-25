@@ -4,12 +4,6 @@ import { useAuth } from './AuthContext';
 
 export type StatusType = 'Available' | 'Away' | 'Busy' | 'Offline';
 
-// interface SocketContextType {
-//   socket: Socket | null;
-//   onlineUserIds: string[];
-//   fetchOnlineUsers: () => void;
-// }
-
 export interface UserPresence {
   status: StatusType;
   customNote?: string;
@@ -39,22 +33,10 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [onlineUserIds, setOnlineUserIds] = useState<string[]>([]);
   const [presences, setPresences] = useState<Record<string, UserPresence>>({});
 
-  // const token = localStorage.getItem('token');
-  // 1. Listen to React Auth State instead of raw localStorage variable
   const { isAuthenticated } = useAuth();
 
   useEffect(() => {
-    // Read the current token dynamically when auth state changes
     const token = localStorage.getItem('token');
-    // if (!token) return;
-    // if (!token) {
-    //   if (socket) {
-    //     socket.disconnect();
-    //     setSocket(null);
-    //   }
-    //   return;
-    // }
-    // If not authenticated or token missing, disconnect any active socket and reset state
     if (!isAuthenticated || !token) {
       if (socket) {
         socket.disconnect();
@@ -65,15 +47,12 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       return;
     }
 
-    // Connect to Chat Service WebSocket server (Port 4002)
     const newSocket = io('http://localhost:4002', {
       auth: { token },
       autoConnect: true,
     });
 
     newSocket.on('connect', () => {
-      console.log('⚡ Connected to WebSocket Server');
-      // Ask for initial online users list
       newSocket.emit('get_online_users');
     });
 

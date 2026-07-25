@@ -28,7 +28,6 @@ const messageService = {
       throw new AppError('Sender ID and Receiver ID are required.', 400);
     }
 
-    // Call repository to update messages
     const result = await messageRepo.markAsRead(senderId, receiverId);
 
     return {

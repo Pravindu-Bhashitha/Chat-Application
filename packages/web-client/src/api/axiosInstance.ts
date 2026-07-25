@@ -1,29 +1,7 @@
-// import axios from 'axios';
-
-// const api = axios.create({
-//   baseURL: 'http://localhost:4001/api', 
-//   headers: {
-//     'Content-Type': 'application/json',
-//   },
-// });
-
-// api.interceptors.request.use(
-//   (config) => {
-//     const token = localStorage.getItem('token');
-//     if (token && config.headers) {
-//       config.headers.Authorization = `Bearer ${token}`;
-//     }
-//     return config;
-//   },
-//   (error) => Promise.reject(error)
-// );
-
-// export default api;
 import axios, { InternalAxiosRequestConfig } from 'axios';
 
-// Service Ports
-const AUTH_SERVICE_URL = 'http://localhost:4001/api';
-const MESSAGE_SERVICE_URL = 'http://localhost:4003/api';
+const AUTH_SERVICE_URL = import.meta.env.VITE_AUTH_SERVICE_URL || '';
+const MESSAGE_SERVICE_URL = import.meta.env.VITE_MESSAGE_SERVICE_URL || '';
 
 // Helper function to attach the Auth token interceptor
 const attachAuthToken = (config: InternalAxiosRequestConfig) => {

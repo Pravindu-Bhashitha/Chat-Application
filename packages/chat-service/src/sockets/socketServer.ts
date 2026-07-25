@@ -22,7 +22,7 @@ const initSocketServer = (server: http.Server): Server => {
   // Attach connection handlers
   io.on('connection', (socket) => {
     const userId = socket.data.user.id;
-    // Join a room named with the user's ID for direct messaging
+
     socket.join(userId);
     handlePresenceEvents(io, socket);
     handleMessageEvents(io, socket);

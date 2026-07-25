@@ -19,16 +19,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   // Load initial auth state on app boot
   useEffect(() => {
     const token = localStorage.getItem('token');
-    console.log('AuthContext: Checking for token in localStorage:', token);
     const savedUser = localStorage.getItem('user');
-    console.log('AuthContext: Checking for user in localStorage:', savedUser);
 
     if (token && savedUser) {
       try {
         setUser(JSON.parse(savedUser));
         setIsAuthenticated(true);
       } catch (err) {
-        // If JSON parsing fails, clear invalid storage
         localStorage.removeItem('token');
         localStorage.removeItem('user');
       }

@@ -12,6 +12,7 @@ const Register = () => {
     const [error, setError] = useState('');
     const [success, setSuccess] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -50,7 +51,7 @@ const Register = () => {
                                 <Form.Label>Username</Form.Label>
                                 <Form.Control
                                     type="text"
-                                    placeholder="johndoe"
+                                    placeholder="Johndoe"
                                     value={username}
                                     onChange={(e) => setUsername(e.target.value)}
                                     required
@@ -70,13 +71,26 @@ const Register = () => {
 
                             <Form.Group className="mb-4" controlId="formBasicPassword">
                                 <Form.Label>Password</Form.Label>
-                                <Form.Control
-                                    type="password"
-                                    placeholder="••••••••"
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    required
-                                />
+                                <div className="position-relative">
+                                    <Form.Control
+                                        type={showPassword ? 'text' : 'password'}
+                                        placeholder="••••••••"
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        required
+                                        style={{ paddingRight: '2.5rem' }}
+                                    />
+                                    <Button
+                                        variant="link"
+                                        type="button"
+                                        onClick={() => setShowPassword((prev) => !prev)}
+                                        tabIndex={-1}
+                                        className="position-absolute top-50 end-0 translate-middle-y text-muted text-decoration-none shadow-none p-0 me-3"
+                                        style={{ zIndex: 5 }}
+                                    >
+                                        {showPassword ? '🙈' : '👁️'}
+                                    </Button>
+                                </div>
                             </Form.Group>
 
                             <Button

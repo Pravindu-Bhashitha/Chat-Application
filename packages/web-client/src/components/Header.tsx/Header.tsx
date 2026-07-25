@@ -10,11 +10,9 @@ interface HeaderProps {
 const Header = ( { username, onLogout }: HeaderProps ) => {
   const { updateStatus, presences, socket } = useSocket();
 
-  // Retrieve current user ID from localStorage
   const savedUser = localStorage.getItem('user');
   const currentUserId = savedUser ? JSON.parse(savedUser).id : null;
 
-  // Get current user's active status from context (defaults to 'Available')
   const currentStatus: StatusType = (currentUserId && presences[currentUserId]?.status) || 'Available';
 
   const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {

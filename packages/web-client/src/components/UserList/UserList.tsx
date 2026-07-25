@@ -30,11 +30,6 @@ const UserList = ({
     unreadCounts,
 }: UserListProps) => {
     if (loading) {
-        // return (
-        //     <div className="text-center p-4">
-        //         <Spinner animation="border" variant="primary" />
-        //     </div>
-        // );
         return <Loading fullScreen={false} />;
     }
 
