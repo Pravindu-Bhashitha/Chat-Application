@@ -13,6 +13,7 @@ model User {
   email     String   @unique
   password  String
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt  @default(now())
 }
 
 model Message {
@@ -24,6 +25,7 @@ model Message {
   isRead         Boolean  @default(false)
   readAt         DateTime?
   createdAt  DateTime @default(now())
+  updatedAt DateTime @updatedAt @default(now()) //I can add message edit feature in future
 
   @@index([conversationId, createdAt])
   @@index([receiverId, isRead])

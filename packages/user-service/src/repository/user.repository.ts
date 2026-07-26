@@ -34,11 +34,15 @@ export async function updateProfile(
 ) {
     return await prisma.user.update({
         where: { id: userId },
-        data,
+        data: {
+            ...data,
+            updatedAt: new Date(),
+        },
         select: {
             id: true,
             username: true,
-            email: true
+            email: true,
+            updatedAt: true,
         },
     });
 }
