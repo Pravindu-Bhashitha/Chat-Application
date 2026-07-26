@@ -10,11 +10,11 @@ router.post('/', authenticateToken, saveMessageController);
 // Authenticated GET route for chat history
 router.get('/recent', authenticateToken, getRecentConversationsController);
 
-router.get('/:otherUserId', authenticateToken, getConversationController);
-
 router.get('/unread-counts', authenticateToken, getUnreadCounts);
 
 router.patch('/read/:senderId', authenticateToken, markMessagesAsRead);
+
+router.get('/:otherUserId', authenticateToken, getConversationController);
 
 
 export default router;

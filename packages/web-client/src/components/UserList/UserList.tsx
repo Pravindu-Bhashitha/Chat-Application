@@ -46,7 +46,7 @@ const UserList = ({
     return (
         <div className="border-end bg-white d-flex flex-column h-100 overflow-hidden">
             <div className="p-3 text-uppercase text-muted fw-bold small border-bottom bg-light">
-                Users Directory ({otherUsers.length})
+                Users Directory ({otherUsers.length > 99 ? '99+' : otherUsers.length})
             </div>
             <div className="flex-grow-1 overflow-auto">
                 <ListGroup variant="flush">
