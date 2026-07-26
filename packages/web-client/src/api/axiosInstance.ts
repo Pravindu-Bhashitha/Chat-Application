@@ -21,7 +21,7 @@ export const authApi = axios.create({
 
 authApi.interceptors.request.use(attachAuthToken, (error) => Promise.reject(error));
 
-// 2. Message Service Axios Instance (Port 4003)
+// 2. Message Service Axios Instance (Port 4002)
 export const messageApi = axios.create({
   baseURL: MESSAGE_SERVICE_URL,
   headers: { 'Content-Type': 'application/json' },

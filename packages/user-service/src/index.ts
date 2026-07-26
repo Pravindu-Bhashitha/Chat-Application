@@ -6,7 +6,7 @@ import userRoutes from './router/user.router';
 dotenv.config({ override: true });
 
 const app = express();
-const PORT = process.env.PORT || 4004;
+const PORT = process.env.PORT || 4003;
 
 app.use(cors({ origin: process.env.FRONTEND_URL || 'http://localhost:5173' }));
 app.use(express.json());

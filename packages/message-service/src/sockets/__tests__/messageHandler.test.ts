@@ -1,11 +1,21 @@
-import { describe, it, expect, beforeEach, beforeAll, afterAll, jest , afterEach } from '@jest/globals';
+import { describe, it, expect, beforeAll, afterAll, jest, afterEach } from '@jest/globals';
 import http from 'http';
 import { AddressInfo } from 'net';
 import { io as Client, Socket as ClientSocket } from 'socket.io-client';
 import jwt from 'jsonwebtoken';
 import initSocketServer from '../socketServer';
+import messageService from '../../services/message.service';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'supersecretkey';
+
+// Mock message.service directly
+jest.mock('../../services/message.service', () => ({
+  __esModule: true,
+  default: {
+    createMessage: jest.fn(),
+    markAsRead: jest.fn(),
+  },
+}));
 
 describe('Message Handler Tests', () => {
   let httpServer: http.Server;
@@ -42,69 +52,62 @@ describe('Message Handler Tests', () => {
     jest.restoreAllMocks();
   });
 
-  it('should post message to HTTP endpoint and emit "receive_message" to sender & receiver', (done) => {
-    const mockSavedMessage = {
-      id: 'msg-123',
-      senderId: 'user-1',
-      receiverId: 'user-2',
-      conversationId: 'user-1_user-2',
-      content: 'Hey there!',
-      createdAt: new Date().toISOString(),
-    };
+  it('should save message via messageService and emit "receive_message" to sender & receiver', (done) => {
+  const mockSavedMessage = {
+    id: 'msg-123',
+    senderId: 'user-1',
+    receiverId: 'user-2',
+    conversationId: 'user-1_user-2',
+    content: 'Hey there!',
+    createdAt: new Date().toISOString(),
+  };
 
-    // Mock global fetch for message-service HTTP endpoint
-    global.fetch = jest.fn<any>().mockResolvedValue({
-      json: async () => mockSavedMessage,
-    });
+  // Mock direct service function
+  (messageService.createMessage as jest.Mock<any>).mockResolvedValue(mockSavedMessage);
 
-    client1 = Client(`http://localhost:${port}`, {
-      auth: { token: user1Token },
-      transports: ['websocket'],
-    });
-
-    client2 = Client(`http://localhost:${port}`, {
-      auth: { token: user2Token },
-      transports: ['websocket'],
-    });
-
-    let client1Received = false;
-    let client2Received = false;
-
-    const checkDone = () => {
-      if (client1Received && client2Received) {
-        expect(global.fetch).toHaveBeenCalledWith(
-          'http://localhost:4002/api/messages',
-          expect.objectContaining({
-            method: 'POST',
-            headers: expect.objectContaining({
-              Authorization: `Bearer ${user1Token}`,
-            }),
-          })
-        );
-        done();
-      }
-    };
-
-    client2.on('connect', () => {
-      client1.emit('send_message', { receiverId: 'user-2', content: 'Hey there!' });
-    });
-
-    client1.on('receive_message', (payload) => {
-      expect(payload.content).toBe('Hey there!');
-      client1Received = true;
-      checkDone();
-    });
-
-    client2.on('receive_message', (payload) => {
-      expect(payload.content).toBe('Hey there!');
-      client2Received = true;
-      checkDone();
-    });
+  client1 = Client(`http://localhost:${port}`, {
+    auth: { token: user1Token },
+    transports: ['websocket'],
   });
 
-  it('should ignore "send_message" if content or receiverId is empty', (done) => {
-    global.fetch = jest.fn<any>();
+  client2 = Client(`http://localhost:${port}`, {
+    auth: { token: user2Token },
+    transports: ['websocket'],
+  });
 
+  let client1Received = false;
+  let client2Received = false;
+
+  const checkDone = () => {
+    if (client1Received && client2Received) {
+      // Expect 3 arguments matching createMessage signature:
+      expect(messageService.createMessage).toHaveBeenCalledWith(
+        'user-1',
+        'user-2',
+        'Hey there!'
+      );
+      done();
+    }
+  };
+
+  client2.on('connect', () => {
+    client1.emit('send_message', { receiverId: 'user-2', content: 'Hey there!' });
+  });
+
+  client1.on('receive_message', (payload) => {
+    expect(payload.content).toBe('Hey there!');
+    client1Received = true;
+    checkDone();
+  });
+
+  client2.on('receive_message', (payload) => {
+    expect(payload.content).toBe('Hey there!');
+    client2Received = true;
+    checkDone();
+  });
+});
+
+  it('should ignore "send_message" if content and mediaUrl are empty', (done) => {
     client1 = Client(`http://localhost:${port}`, {
       auth: { token: user1Token },
       transports: ['websocket'],
@@ -114,7 +117,7 @@ describe('Message Handler Tests', () => {
       client1.emit('send_message', { receiverId: 'user-2', content: '' });
 
       setTimeout(() => {
-        expect(global.fetch).not.toHaveBeenCalled();
+        expect(messageService.createMessage).not.toHaveBeenCalled();
         done();
       }, 300);
     });

@@ -7,6 +7,13 @@ generator client {
   provider = "prisma-client-js"
 }
 
+enum MessageType {
+  TEXT
+  IMAGE
+  FILE
+  AUDIO
+}
+
 model User {
   id        String   @id @default(uuid())
   username  String   @unique
@@ -22,6 +29,8 @@ model Message {
   receiverId String
   conversationId String
   content    String
+  type     MessageType @default(TEXT)
+  mediaUrl String?
   isRead         Boolean  @default(false)
   readAt         DateTime?             
   createdAt  DateTime @default(now())

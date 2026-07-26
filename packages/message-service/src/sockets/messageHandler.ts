@@ -1,13 +1,7 @@
 import { Server, Socket } from 'socket.io';
 import { getConversationId } from '../utils/conversationId';
-
-export interface MessageData {
-    senderId: string;
-    receiverId: string;
-    content: string;
-    timestamp?: string;
-    conversationId?: string;
-}
+import messageService from '../services/message.service';
+import { MessageData } from '../types';
 
 const handleMessageEvents = (io: Server, socket: Socket) => {
     const user = socket.data.user; // Authenticated user from socketAuth middleware
@@ -21,23 +15,24 @@ const handleMessageEvents = (io: Server, socket: Socket) => {
             return;
         }
 
-        const token = socket.handshake.auth?.token;
+        // const token = socket.handshake.auth?.token;
 
-        const response = await fetch('http://localhost:4002/api/messages', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify({
-                senderId: user.id,
-                receiverId,
-                content,
-                conversationId: getConversationId(user.id, receiverId),
-            }),
-        });
+        // const response = await fetch('http://localhost:4002/api/messages', {
+        //     method: 'POST',
+        //     headers: {
+        //         'Content-Type': 'application/json',
+        //         'Authorization': `Bearer ${token}`
+        //     },
+        //     body: JSON.stringify({
+        //         senderId: user.id,
+        //         receiverId,
+        //         content,
+        //         conversationId: getConversationId(user.id, receiverId),
+        //     }),
+        // });
 
-        const savedMessage = await response.json();
+        const savedMessage = await messageService.createMessage(user.id, receiverId, content);
+
         console.log('Saved message:', savedMessage);
 
         const messagePayload: MessageData = {
@@ -45,7 +40,9 @@ const handleMessageEvents = (io: Server, socket: Socket) => {
             receiverId,
             content,
             conversationId: getConversationId(user.id, receiverId),
-            timestamp: savedMessage.createdAt || new Date().toISOString(),
+            timestamp: savedMessage.createdAt
+                ? new Date(savedMessage.createdAt).toISOString()
+                : new Date().toISOString(),
         };
 
         console.log(`📩 Message from ${user.username} to ${receiverId}: "${content}"`);
