@@ -1,12 +1,17 @@
 import * as messageRepo from '../repository/message.repository';
+import { CreateMessageData } from '../types';
 import { AppError } from '../utils/AppError';
 
 const messageService = {
-  async createMessage(senderId: string, receiverId: string, content: string) {
-    if (!senderId || !receiverId || !content.trim()) {
-      throw new AppError('Sender, receiver, and message content cannot be empty.', 400);
+  async createMessage(data: CreateMessageData) {
+    const { senderId, receiverId, content, type = 'TEXT', mediaUrl } = data;
+
+    const trimmedContent = content ? content.trim() : '';
+
+    if (!senderId || !receiverId || (!content.trim() && !mediaUrl)) {
+      throw new AppError('Sender, receiver, and message content/attachment are required.', 400);
     }
-    return await messageRepo.createMessage(senderId, receiverId, content.trim());
+    return await messageRepo.createMessage({senderId, receiverId, content: trimmedContent, type, mediaUrl});
   },
 
   async getConversation(user1Id: string, user2Id: string) {

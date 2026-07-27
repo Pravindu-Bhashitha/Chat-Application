@@ -1,8 +1,11 @@
 import { Router } from 'express';
-import { saveMessageController,  getRecentConversationsController, getConversationController, getUnreadCounts, markMessagesAsRead } from '../controllers/message.controller';
+import { saveMessageController,  getRecentConversationsController, getConversationController, getUnreadCounts, markMessagesAsRead, uploadMediaController } from '../controllers/message.controller';
 import authenticateToken from '../middleware/auth.middleware';
+import { upload } from '../middleware/upload.middleware';
 
 const router = Router();
+
+router.post('/upload', authenticateToken, upload.single('file'), uploadMediaController);
 
 // Internal/HTTP POST route to save message
 router.post('/', authenticateToken, saveMessageController);

@@ -3,21 +3,87 @@ import { AuthenticatedRequest } from '../middleware/auth.middleware';
 import messageService from '../services/message.service';
 import { AppError } from '../utils/AppError';
 
+// export const uploadMediaController = async (req: Request, res: Response) => {
+//   try {
+//     if (!req.file) {
+//       return res.status(400).json({ error: 'No file uploaded', statusCode: 400 });
+//     }
+
+//     let type: 'IMAGE' | 'AUDIO' | 'FILE' = 'FILE';
+//     if (req.file.mimetype.startsWith('image/')) {
+//       type = 'IMAGE';
+//     } else if (req.file.mimetype.startsWith('audio/')) {
+//       type = 'AUDIO';
+//     }
+
+//     // Construct full public URL for the uploaded file
+//     const mediaUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
+
+//     return res.status(200).json({
+//       mediaUrl,
+//       type,
+//       originalName: req.file.originalname,
+//       size: req.file.size,
+//     });
+//   } catch (error) {
+//     console.error('Upload error:', error);
+//     return res.status(500).json({ error: 'Failed to process file upload', statusCode: 500 });
+//   }
+// };
+export const uploadMediaController = async (req: Request, res: Response) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No file uploaded', statusCode: 400 });
+    }
+
+    let type: 'IMAGE' | 'AUDIO' | 'FILE' = 'FILE';
+    if (req.file.mimetype.startsWith('image/')) {
+      type = 'IMAGE';
+    } else if (req.file.mimetype.startsWith('audio/')) {
+      type = 'AUDIO';
+    }
+
+    // Determine whether req.file.path is a full HTTPS Cloudinary URL or local filename
+    const isCloudUrl = req.file.path && req.file.path.startsWith('http');
+    const mediaUrl = isCloudUrl
+      ? req.file.path
+      : `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
+
+    return res.status(200).json({
+      mediaUrl,
+      type,
+      originalName: req.file.originalname,
+      size: req.file.size,
+    });
+  } catch (error) {
+    console.error('Upload error:', error);
+    return res.status(500).json({ error: 'Failed to process file upload', statusCode: 500 });
+  }
+};
+
 export const saveMessageController = async (req: Request, res: Response) => {
   try {
-    const { senderId, receiverId, content } = req.body;
+    const { senderId, receiverId, content, type = 'TEXT', mediaUrl } = req.body;
 
-    if (!senderId || !receiverId || !content) {
+    if (!senderId || !receiverId || (!content && !mediaUrl)) {
       return res.status(400).json({ error: 'Missing required fields', statusCode: 400 });
     }
 
-    const message = await messageService.createMessage(senderId, receiverId, content);
-    res.status(201).json({
+    const message = await messageService.createMessage({
+      senderId,
+      receiverId,
+      content: content || '',
+      type,
+      mediaUrl,
+    });
+    return res.status(201).json({
       id: message.id,
       senderId: message.senderId,
       receiverId: message.receiverId,
       conversationId: message.conversationId,
       content: message.content,
+      type: message.type,
+      mediaUrl: message.mediaUrl,
       isRead: message.isRead,
       timestamp: message.createdAt.toISOString(),
     });
@@ -96,8 +162,8 @@ export const getRecentConversationsController = async (req: AuthenticatedRequest
 
 export const markMessagesAsRead = async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const userId = req.user?.id; 
-    const { senderId } = req.params;  
+    const userId = req.user?.id;
+    const { senderId } = req.params;
 
     if (!userId || !senderId) {
       return res.status(400).json({ error: 'User ID is required', statusCode: 400 });

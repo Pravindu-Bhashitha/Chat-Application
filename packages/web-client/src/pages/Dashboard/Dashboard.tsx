@@ -191,6 +191,25 @@ const Dashboard = () => {
     setInputMessage('');
   };
 
+  const handleSendMedia = async (file: File) => {
+    if (!selectedUser || !socket) return;
+
+    try {
+      // 1. Upload to backend storage
+      const uploadRes = await messageService.uploadMedia(file);
+
+      // 2. Emit over Socket.io
+      socket.emit('send_message', {
+        receiverId: selectedUser.id,
+        content: file.name, // Display filename as content
+        type: uploadRes.type,
+        mediaUrl: uploadRes.mediaUrl,
+      });
+    } catch (err) {
+      console.error('Failed to upload file:', err);
+    }
+  };
+
   const handleSelectUser = (user: User) => {
     setSelectedUser(user);
     setUnreadCounts((prev) => ({
@@ -261,6 +280,7 @@ const Dashboard = () => {
               inputMessage={inputMessage}
               onInputChange={setInputMessage}
               onSendMessage={handleSendMessage}
+              onSendMedia={handleSendMedia}
               presences={presences}
               onBack={() => setSelectedUser(null)}
             />

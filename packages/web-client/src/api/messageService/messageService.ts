@@ -28,11 +28,28 @@ export const messageService = {
     getUnreadCounts: async () => {
         const response = await messageApi.get('/messages/unread-counts');
         console.log('Unread counts fetched:', response);
-        return response.data; 
+        return response.data;
     },
 
     markAsRead: async (senderId: string) => {
         const response = await messageApi.patch(`/messages/read/${senderId}`);
         return response.data;
+    },
+
+    uploadMedia: async (file: File) => {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const response = await messageApi.post('/messages/upload', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+
+        if (!response) {
+            throw new Error('Failed to upload file');
+        }
+
+        return response.data; // returns { mediaUrl, type, originalName, size }
     },
 };

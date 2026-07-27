@@ -1,5 +1,5 @@
-import React, { useRef, useEffect } from 'react';
-import { Button, Form, InputGroup } from 'react-bootstrap';
+import React, { useRef, useEffect, useState } from 'react';
+import { Button, Form, InputGroup, Spinner } from 'react-bootstrap';
 import { Message, User } from '../../types';
 import CustomButton from '../CustomButton/CustomButton';
 import { StatusType } from '../../context/SocketContext';
@@ -14,6 +14,7 @@ interface ChatAreaProps {
     inputMessage: string;
     onInputChange: (value: string) => void;
     onSendMessage: (e: React.FormEvent) => void;
+    onSendMedia: (file: File) => Promise<void>;
     presences: Record<string, { status: StatusType; customNote?: string }>;
     onBack: () => void;
 }
@@ -28,12 +29,28 @@ const ChatArea = ({
     onSendMessage,
     presences,
     onBack,
+    onSendMedia
 }: ChatAreaProps) => {
     const messagesEndRef = useRef<HTMLDivElement | null>(null);
+    const fileInputRef = useRef<HTMLInputElement | null>(null);
+    const [uploading, setUploading] = useState(false);
 
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [messages]);
+
+    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        try {
+            setUploading(true);
+            await onSendMedia(file);
+        } finally {
+            setUploading(false);
+            if (fileInputRef.current) fileInputRef.current.value = '';
+        }
+    };
 
     if (!selectedUser) {
         return (
@@ -82,7 +99,13 @@ const ChatArea = ({
                 ) : (
                     activeChatMessages.map((msg, index) => {
                         const isMe = msg.senderId === currentUserId;
-
+                        const isImage =
+                            msg.type === 'IMAGE' ||
+                            (!!msg.mediaUrl && /\.(jpg|jpeg|png|gif|webp)$/i.test(msg.mediaUrl));
+                        console.log('Rendering message:', msg, 'isMe:', isMe, 'isImage:', isImage);
+                        const isFile =
+                            msg.type === 'FILE' ||
+                            (!!msg.mediaUrl && !isImage);
                         return (
                             <div
                                 key={msg.id || index}
@@ -98,7 +121,70 @@ const ChatArea = ({
                                         position: 'relative',
                                     }}
                                 >
-                                    <div>{msg.content}</div>
+                                    {/* Render Media */}
+                                    {/* {isImage && msg.mediaUrl && (
+                                        <div className="mb-2">
+                                            <img
+                                                src={msg.mediaUrl}
+                                                alt={msg.content || 'Attached Image'}
+                                                className="img-fluid rounded border"
+                                                style={{ maxHeight: '250px', objectFit: 'cover', cursor: 'pointer' }}
+                                                onClick={() => window.open(msg.mediaUrl, '_blank')}
+                                            />
+                                        </div>
+                                    )} */}
+                                    {isImage && msg.mediaUrl && (
+                                        <div className="mb-2">
+                                            <img
+                                                src={msg.mediaUrl}
+                                                alt={msg.content || 'Attached Image'}
+                                                className="img-fluid rounded border"
+                                                style={{
+                                                    maxHeight: '250px',
+                                                    objectFit: 'cover',
+                                                    cursor: 'pointer',
+                                                }}
+                                                onClick={() => window.open(msg.mediaUrl, '_blank')}
+                                            />
+                                        </div>
+                                    )}
+
+                                    {/* {isFile && msg.mediaUrl && (
+                                        <div className="mb-2">
+                                            <a
+                                                href={msg.mediaUrl}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className={`d-flex align-items-center gap-2 p-2 rounded text-decoration-none ${isMe ? 'bg-white text-primary' : 'bg-light text-dark border'
+                                                    }`}
+                                            >
+                                                📎 <span className="fw-semibold text-truncate">{msg.content || 'Download Attachment'}</span>
+                                            </a>
+                                        </div>
+                                    )} */}
+                                    {isFile && msg.mediaUrl && (
+                                        <div className="mb-2">
+                                            <a
+                                                href={msg.mediaUrl}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className={`d-flex align-items-center gap-2 p-2 rounded text-decoration-none ${isMe
+                                                    ? 'bg-white text-primary'
+                                                    : 'bg-light text-dark border'
+                                                    }`}
+                                            >
+                                                📎{' '}
+                                                <span className="fw-semibold text-truncate">
+                                                    {msg.content || 'Download Attachment'}
+                                                </span>
+                                            </a>
+                                        </div>
+                                    )}
+
+                                    {/* Text Content */}
+                                    {(!isImage && !isFile) && (
+                                        <div>{msg.content}</div>
+                                    )}
                                     <div
                                         className={`d-flex align-items-center justify-content-end gap-1 mt-1 ${isMe ? 'text-white-50' : 'text-muted'
                                             }`}
@@ -123,6 +209,23 @@ const ChatArea = ({
             <div className="bg-white border-top p-3 flex-shrink-0">
                 <Form onSubmit={onSendMessage}>
                     <InputGroup>
+                        {/* Hidden File Input */}
+                        <input
+                            type="file"
+                            ref={fileInputRef}
+                            style={{ display: 'none' }}
+                            onChange={handleFileChange}
+                        />
+
+                        {/* Attachment Button */}
+                        <Button
+                            variant="outline-secondary"
+                            className="rounded-start-pill border-end-0 shadow-none px-3"
+                            onClick={() => fileInputRef.current?.click()}
+                            disabled={uploading}
+                        >
+                            {uploading ? <Spinner animation="border" size="sm" /> : '📎'}
+                        </Button>
                         <Form.Control
                             type="text"
                             placeholder={`Message ${selectedUser.username}...`}

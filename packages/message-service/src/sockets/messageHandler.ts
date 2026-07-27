@@ -8,10 +8,10 @@ const handleMessageEvents = (io: Server, socket: Socket) => {
     console.log("socket", socket.data)
 
     // Event: Client sends a direct message
-    socket.on('send_message', async (data: { receiverId: string; content: string }) => {
-        const { receiverId, content } = data;
+    socket.on('send_message', async (data: { receiverId: string; content: string; type?: 'TEXT' | 'IMAGE' | 'FILE' | 'AUDIO'; mediaUrl?: string }) => {
+       const { receiverId, content, type, mediaUrl } = data;
 
-        if (!content || !receiverId) {
+        if (!content || !receiverId || (!content.trim() && !mediaUrl)) {
             return;
         }
 
@@ -31,7 +31,7 @@ const handleMessageEvents = (io: Server, socket: Socket) => {
         //     }),
         // });
 
-        const savedMessage = await messageService.createMessage(user.id, receiverId, content);
+        const savedMessage = await messageService.createMessage({senderId: user.id, receiverId, content, type, mediaUrl});
 
         console.log('Saved message:', savedMessage);
 
@@ -43,6 +43,8 @@ const handleMessageEvents = (io: Server, socket: Socket) => {
             timestamp: savedMessage.createdAt
                 ? new Date(savedMessage.createdAt).toISOString()
                 : new Date().toISOString(),
+            mediaUrl: mediaUrl || undefined,
+            type: type || 'TEXT'
         };
 
         console.log(`📩 Message from ${user.username} to ${receiverId}: "${content}"`);

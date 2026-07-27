@@ -2,8 +2,10 @@ export interface Message {
   id: string;
   senderId: string;
   receiverId: string;
+  conversationId?: string;
   content: string;
-  timestamp: string;
+  type?: 'TEXT' | 'IMAGE' | 'FILE' | 'AUDIO';
+  mediaUrl?: string;
   isRead: boolean;
-  unreadCount?: number; 
+  timestamp: string;
 }

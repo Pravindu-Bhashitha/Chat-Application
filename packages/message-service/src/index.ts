@@ -4,6 +4,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import messageRoutes from './router/message.routes';
 import initSocketServer from './sockets/socketServer';
+import path from 'path';
 
 dotenv.config({ override: true });
 
@@ -18,7 +19,7 @@ app.use(express.json());
 const server = http.createServer(app);
 
 initSocketServer(server);
-
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 // Routes
 app.use('/api/messages', messageRoutes);
 

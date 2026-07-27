@@ -3,7 +3,8 @@ import { getConversationId } from "../utils/conversationId";
 
 const prisma = new PrismaClient();
 
-export async function createMessage(senderId: string, receiverId: string, content: string) {
+export async function createMessage(data: { senderId: string; receiverId: string; content: string; type?: 'TEXT' | 'IMAGE' | 'FILE' | 'AUDIO'; mediaUrl?: string }) {
+  const { senderId, receiverId, content, type = 'TEXT', mediaUrl } = data;
   const conversationId = getConversationId(senderId, receiverId);
   console.log("Conversation ID:", conversationId); 
   return await prisma.message.create({
@@ -11,7 +12,9 @@ export async function createMessage(senderId: string, receiverId: string, conten
       senderId,
       receiverId,
       conversationId,
-      content
+      content,
+      type,
+      mediaUrl,
     },
   });
 }
