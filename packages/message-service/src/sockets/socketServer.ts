@@ -7,10 +7,11 @@ import socketAuthMiddleware from '../middleware/socketAuth.middleware';
 
 dotenv.config();
 
-const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN || '';
+const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN
+  ? process.env.CLIENT_ORIGIN.split(',').map((origin) => origin.trim())
+  : ['http://localhost:5173', 'http://localhost'];
 
 const initSocketServer = (server: http.Server): Server => {
-  console.log(`Initializing Socket.io server with CORS origin: ${CLIENT_ORIGIN}`);
   const io = new Server(server, {
     cors: {
       origin: CLIENT_ORIGIN,

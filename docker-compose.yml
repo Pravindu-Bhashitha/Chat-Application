@@ -23,6 +23,7 @@ services:
       - PORT=4001
       - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?schema=public
       - JWT_SECRET=${JWT_SECRET}
+      - FRONTEND_URL=${FRONTEND_URL}
     depends_on:
       - postgres
 
@@ -37,6 +38,7 @@ services:
       - PORT=4003
       - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?schema=public
       - JWT_SECRET=${JWT_SECRET}
+      - FRONTEND_URL=${FRONTEND_URL}
     depends_on:
       - postgres
 
@@ -54,6 +56,8 @@ services:
       - CLOUDINARY_CLOUD_NAME=${CLOUDINARY_CLOUD_NAME}
       - CLOUDINARY_API_KEY=${CLOUDINARY_API_KEY}
       - CLOUDINARY_API_SECRET=${CLOUDINARY_API_SECRET}
+      - FRONTEND_URL=${FRONTEND_URL}
+      - CLIENT_ORIGIN=${FRONTEND_URL}
     depends_on:
       - postgres
 

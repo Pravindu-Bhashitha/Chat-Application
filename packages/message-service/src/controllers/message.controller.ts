@@ -115,6 +115,7 @@ export const getConversationController = async (req: AuthenticatedRequest, res: 
       content: m.content,
       isRead: m.isRead,
       timestamp: m.createdAt.toISOString(),
+      
     }));
 
     res.json(formattedMessages);

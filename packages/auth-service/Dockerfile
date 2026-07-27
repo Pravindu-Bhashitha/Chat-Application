@@ -43,4 +43,5 @@ COPY --from=builder /app/packages/shared ./packages/shared
 COPY --from=builder /app/packages/auth-service ./packages/auth-service
 
 EXPOSE 4001
-CMD ["node", "packages/auth-service/dist/index.js"]
+# CMD ["node", "packages/auth-service/dist/index.js"]
+CMD ["sh", "-c", "npx prisma db push --schema=packages/auth-service/prisma/schema.prisma --accept-data-loss && node packages/auth-service/dist/index.js"]
