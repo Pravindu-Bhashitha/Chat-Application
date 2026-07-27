@@ -1,5 +1,8 @@
 FROM node:20-alpine AS builder
 
+# Install OpenSSL and glibc compatibility layer for Alpine
+RUN apk add --no-cache openssl libc6-compat
+
 WORKDIR /app
 
 COPY package*.json ./
@@ -18,6 +21,10 @@ RUN npx --workspace=packages/message-service prisma generate
 RUN npm run build --workspace=packages/message-service
 
 FROM node:20-alpine AS runner
+
+# Required at runtime so Prisma engine can link SSL
+RUN apk add --no-cache openssl libc6-compat
+
 WORKDIR /app
 
 ENV NODE_ENV=production

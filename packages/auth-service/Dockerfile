@@ -1,4 +1,8 @@
+# Stage 1: Builder
 FROM node:20-alpine AS builder
+
+# Install OpenSSL and glibc compatibility library for Alpine
+RUN apk add --no-cache openssl libc6-compat
 
 WORKDIR /app
 
@@ -23,8 +27,12 @@ RUN npm run build --workspace=packages/shared
 RUN npx --workspace=packages/auth-service prisma generate
 RUN npm run build --workspace=packages/auth-service
 
-# Production Stage
+# Stage 2: Production Runner
 FROM node:20-alpine AS runner
+
+# Required so Prisma's runtime binary can bind to SSL in the running container
+RUN apk add --no-cache openssl libc6-compat
+
 WORKDIR /app
 
 ENV NODE_ENV=production

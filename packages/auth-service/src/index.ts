@@ -7,25 +7,22 @@ dotenv.config({ override: true });
 
 const app = express();
 app.use(express.json());
+
+const allowedOrigins = [
+  ...(process.env.FRONTEND_URL ? process.env.FRONTEND_URL.split(',') : []),
+  process.env.NGROK_URL,
+].filter(Boolean);
 app.use(
-    cors({
-        origin: (origin, callback) => {
-            const allowed = [
-                process.env.FRONTEND_URL,
-                process.env.NGROK_URL,
-            ].filter(Boolean);
-
-            if (!origin || allowed.includes(origin))
-                return callback(null, true);
-
-            callback(
-                new Error(
-                    "CORS_BLOCKED"
-                )
-            );
-        },
-        credentials: true,
-    })
+  cors({
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps, curl, or same-origin proxy requests)
+      if (!origin || allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      return callback(new Error("CORS_BLOCKED"));
+    },
+    credentials: true,
+  })
 );
 
 
