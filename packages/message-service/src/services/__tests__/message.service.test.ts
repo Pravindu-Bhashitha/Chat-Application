@@ -19,6 +19,8 @@ describe('Message Service Unit Tests', () => {
         receiverId: 'user-2',
         conversationId: 'user-1_user-2',
         content: 'Hello World',
+        type: 'TEXT' as const,
+        mediaUrl: null,
         isRead: false,
         readAt: null,
         createdAt: new Date(),
@@ -27,16 +29,32 @@ describe('Message Service Unit Tests', () => {
 
       mockedMessageRepo.createMessage.mockResolvedValue(mockMessage);
 
-      const result = await messageService.createMessage('user-1', 'user-2', '  Hello World  ');
+      const result = await messageService.createMessage({
+        senderId: 'user-1',
+        receiverId: 'user-2',
+        content: '  Hello World  ',
+      });
 
-      expect(mockedMessageRepo.createMessage).toHaveBeenCalledWith('user-1', 'user-2', 'Hello World');
+      expect(mockedMessageRepo.createMessage).toHaveBeenCalledWith({
+        senderId: 'user-1',
+        receiverId: 'user-2',
+        content: 'Hello World',
+        type: 'TEXT',
+        mediaUrl: undefined,
+      });
       expect(result).toEqual(mockMessage);
     });
 
     it('should throw AppError(400) if content is empty or whitespace', async () => {
       await expect(
-        messageService.createMessage('user-1', 'user-2', '   ')
-      ).rejects.toThrow(new AppError('Sender, receiver, and message content cannot be empty.', 400));
+        messageService.createMessage({
+          senderId: 'user-1',
+          receiverId: 'user-2',
+          content: '   ',
+        })
+      ).rejects.toThrow(
+        new AppError('Sender, receiver, and message content/attachment are required.', 400)
+      );
     });
   });
 
@@ -49,6 +67,8 @@ describe('Message Service Unit Tests', () => {
           receiverId: 'user-2',
           conversationId: 'user-1_user-2',
           content: 'Hi',
+          type: 'TEXT' as const,
+          mediaUrl: null,
           isRead: true,
           readAt: new Date(),
           createdAt: new Date(),
@@ -80,6 +100,8 @@ describe('Message Service Unit Tests', () => {
           receiverId: 'user-1',
           conversationId: 'user-1_user-2',
           content: 'Latest message',
+          type: 'TEXT' as const,
+          mediaUrl: null,
           isRead: false,
           readAt: null,
           createdAt: new Date(),

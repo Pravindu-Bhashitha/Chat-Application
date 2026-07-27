@@ -53,59 +53,61 @@ describe('Message Handler Tests', () => {
   });
 
   it('should save message via messageService and emit "receive_message" to sender & receiver', (done) => {
-  const mockSavedMessage = {
-    id: 'msg-123',
-    senderId: 'user-1',
-    receiverId: 'user-2',
-    conversationId: 'user-1_user-2',
-    content: 'Hey there!',
-    createdAt: new Date().toISOString(),
-  };
+    const mockSavedMessage = {
+      id: 'msg-123',
+      senderId: 'user-1',
+      receiverId: 'user-2',
+      conversationId: 'user-1_user-2',
+      content: 'Hey there!',
+      createdAt: new Date().toISOString(),
+    };
 
-  // Mock direct service function
-  (messageService.createMessage as jest.Mock<any>).mockResolvedValue(mockSavedMessage);
+    // Mock direct service function
+    (messageService.createMessage as jest.Mock<any>).mockResolvedValue(mockSavedMessage);
 
-  client1 = Client(`http://localhost:${port}`, {
-    auth: { token: user1Token },
-    transports: ['websocket'],
+    client1 = Client(`http://localhost:${port}`, {
+      auth: { token: user1Token },
+      transports: ['websocket'],
+    });
+
+    client2 = Client(`http://localhost:${port}`, {
+      auth: { token: user2Token },
+      transports: ['websocket'],
+    });
+
+    let client1Received = false;
+    let client2Received = false;
+
+    const checkDone = () => {
+      if (client1Received && client2Received) {
+        // Updated to match the actual object signature passed to createMessage
+        expect(messageService.createMessage).toHaveBeenCalledWith(
+          expect.objectContaining({
+            senderId: 'user-1',
+            receiverId: 'user-2',
+            content: 'Hey there!',
+          })
+        );
+        done();
+      }
+    };
+
+    client2.on('connect', () => {
+      client1.emit('send_message', { receiverId: 'user-2', content: 'Hey there!' });
+    });
+
+    client1.on('receive_message', (payload) => {
+      expect(payload.content).toBe('Hey there!');
+      client1Received = true;
+      checkDone();
+    });
+
+    client2.on('receive_message', (payload) => {
+      expect(payload.content).toBe('Hey there!');
+      client2Received = true;
+      checkDone();
+    });
   });
-
-  client2 = Client(`http://localhost:${port}`, {
-    auth: { token: user2Token },
-    transports: ['websocket'],
-  });
-
-  let client1Received = false;
-  let client2Received = false;
-
-  const checkDone = () => {
-    if (client1Received && client2Received) {
-      // Expect 3 arguments matching createMessage signature:
-      expect(messageService.createMessage).toHaveBeenCalledWith(
-        'user-1',
-        'user-2',
-        'Hey there!'
-      );
-      done();
-    }
-  };
-
-  client2.on('connect', () => {
-    client1.emit('send_message', { receiverId: 'user-2', content: 'Hey there!' });
-  });
-
-  client1.on('receive_message', (payload) => {
-    expect(payload.content).toBe('Hey there!');
-    client1Received = true;
-    checkDone();
-  });
-
-  client2.on('receive_message', (payload) => {
-    expect(payload.content).toBe('Hey there!');
-    client2Received = true;
-    checkDone();
-  });
-});
 
   it('should ignore "send_message" if content and mediaUrl are empty', (done) => {
     client1 = Client(`http://localhost:${port}`, {
