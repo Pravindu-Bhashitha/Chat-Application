@@ -143,8 +143,10 @@ const ChatArea = ({
                                                     maxHeight: '250px',
                                                     objectFit: 'cover',
                                                     cursor: 'pointer',
+                                                    aspectRatio: '16/9',
                                                 }}
                                                 onClick={() => window.open(msg.mediaUrl, '_blank')}
+                                                loading='lazy'
                                             />
                                         </div>
                                     )}
