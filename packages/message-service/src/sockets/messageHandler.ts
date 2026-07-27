@@ -4,7 +4,8 @@ import messageService from '../services/message.service';
 import { MessageData } from '../types';
 
 const handleMessageEvents = (io: Server, socket: Socket) => {
-    const user = socket.data.user; // Authenticated user from socketAuth middleware
+    const user = socket.data.user; 
+
     console.log("socket", socket.data)
 
     // Event: Client sends a direct message
@@ -14,22 +15,6 @@ const handleMessageEvents = (io: Server, socket: Socket) => {
         if (!content || !receiverId || (!content.trim() && !mediaUrl)) {
             return;
         }
-
-        // const token = socket.handshake.auth?.token;
-
-        // const response = await fetch('http://localhost:4002/api/messages', {
-        //     method: 'POST',
-        //     headers: {
-        //         'Content-Type': 'application/json',
-        //         'Authorization': `Bearer ${token}`
-        //     },
-        //     body: JSON.stringify({
-        //         senderId: user.id,
-        //         receiverId,
-        //         content,
-        //         conversationId: getConversationId(user.id, receiverId),
-        //     }),
-        // });
 
         const savedMessage = await messageService.createMessage({senderId: user.id, receiverId, content, type, mediaUrl});
 
@@ -47,18 +32,18 @@ const handleMessageEvents = (io: Server, socket: Socket) => {
             type: type || 'TEXT'
         };
 
-        console.log(`📩 Message from ${user.username} to ${receiverId}: "${content}"`);
+        console.log(`Message from ${user.username} to ${receiverId}: "${content}"`);
 
         io.to(receiverId).emit('receive_message', messagePayload);
         socket.emit('receive_message', messagePayload);
     });
     socket.on('mark_as_read', ({ senderId }: { senderId: string }) => {
-        console.log(`👁️ User ${user.id} is marking messages from ${senderId} as read`);
+        console.log(`User ${user.id} is marking messages from ${senderId} as read`);
         if (!senderId) return;
 
-        console.log(`👁️ User ${user.id} read messages sent by ${senderId}`);
+        console.log(`User ${user.id} read messages sent by ${senderId}`);
 
-        // Notify the original sender that this user (`user.id`) has read their messages
+        // Notify the original sender that this user has read their messages
         io.to(senderId).emit('messages_read', {
             readByUserId: user.id,
         });

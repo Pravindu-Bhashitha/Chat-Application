@@ -8,7 +8,6 @@ const JWT_SECRET = process.env.JWT_SECRET || 'supersecretkey';
 
 const socketAuthMiddleware = (socket: Socket, next: (err?: Error) => void) => {
   const token = socket.handshake.auth.token;
-  console.log('🔑 Socket Auth Middleware: Received token:', token);
 
   if (!token) {
     return next(new Error('Authentication error: Token missing'));

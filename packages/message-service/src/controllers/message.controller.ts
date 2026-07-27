@@ -1,36 +1,9 @@
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import { AuthenticatedRequest } from '../middleware/auth.middleware';
 import messageService from '../services/message.service';
 import { AppError } from '../utils/AppError';
 
-// export const uploadMediaController = async (req: Request, res: Response) => {
-//   try {
-//     if (!req.file) {
-//       return res.status(400).json({ error: 'No file uploaded', statusCode: 400 });
-//     }
-
-//     let type: 'IMAGE' | 'AUDIO' | 'FILE' = 'FILE';
-//     if (req.file.mimetype.startsWith('image/')) {
-//       type = 'IMAGE';
-//     } else if (req.file.mimetype.startsWith('audio/')) {
-//       type = 'AUDIO';
-//     }
-
-//     // Construct full public URL for the uploaded file
-//     const mediaUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
-
-//     return res.status(200).json({
-//       mediaUrl,
-//       type,
-//       originalName: req.file.originalname,
-//       size: req.file.size,
-//     });
-//   } catch (error) {
-//     console.error('Upload error:', error);
-//     return res.status(500).json({ error: 'Failed to process file upload', statusCode: 500 });
-//   }
-// };
-export const uploadMediaController = async (req: Request, res: Response) => {
+export const uploadMediaController = async (req: AuthenticatedRequest, res: Response) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: 'No file uploaded', statusCode: 400 });
@@ -43,7 +16,6 @@ export const uploadMediaController = async (req: Request, res: Response) => {
       type = 'AUDIO';
     }
 
-    // Determine whether req.file.path is a full HTTPS Cloudinary URL or local filename
     const isCloudUrl = req.file.path && req.file.path.startsWith('http');
     const mediaUrl = isCloudUrl
       ? req.file.path
@@ -56,12 +28,15 @@ export const uploadMediaController = async (req: Request, res: Response) => {
       size: req.file.size,
     });
   } catch (error) {
+    if (error instanceof AppError) {
+      return res.status(error.statusCode).json({ error: error.message, statusCode: error.statusCode });
+    }
     console.error('Upload error:', error);
     return res.status(500).json({ error: 'Failed to process file upload', statusCode: 500 });
   }
 };
 
-export const saveMessageController = async (req: Request, res: Response) => {
+export const saveMessageController = async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { senderId, receiverId, content, type = 'TEXT', mediaUrl } = req.body;
 
