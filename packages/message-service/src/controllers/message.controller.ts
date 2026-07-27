@@ -3,33 +3,6 @@ import { AuthenticatedRequest } from '../middleware/auth.middleware';
 import messageService from '../services/message.service';
 import { AppError } from '../utils/AppError';
 
-// export const uploadMediaController = async (req: Request, res: Response) => {
-//   try {
-//     if (!req.file) {
-//       return res.status(400).json({ error: 'No file uploaded', statusCode: 400 });
-//     }
-
-//     let type: 'IMAGE' | 'AUDIO' | 'FILE' = 'FILE';
-//     if (req.file.mimetype.startsWith('image/')) {
-//       type = 'IMAGE';
-//     } else if (req.file.mimetype.startsWith('audio/')) {
-//       type = 'AUDIO';
-//     }
-
-//     // Construct full public URL for the uploaded file
-//     const mediaUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
-
-//     return res.status(200).json({
-//       mediaUrl,
-//       type,
-//       originalName: req.file.originalname,
-//       size: req.file.size,
-//     });
-//   } catch (error) {
-//     console.error('Upload error:', error);
-//     return res.status(500).json({ error: 'Failed to process file upload', statusCode: 500 });
-//   }
-// };
 export const uploadMediaController = async (req: Request, res: Response) => {
   try {
     if (!req.file) {
@@ -115,7 +88,8 @@ export const getConversationController = async (req: AuthenticatedRequest, res: 
       content: m.content,
       isRead: m.isRead,
       timestamp: m.createdAt.toISOString(),
-      
+      type: m.type,
+      mediaUrl: m.mediaUrl,
     }));
 
     res.json(formattedMessages);
