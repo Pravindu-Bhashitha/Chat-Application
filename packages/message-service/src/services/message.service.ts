@@ -8,7 +8,7 @@ const messageService = {
 
     const trimmedContent = content ? content.trim() : '';
 
-    if (!senderId || !receiverId || (!content.trim() && !mediaUrl)) {
+   if (!senderId || !receiverId || (!trimmedContent && !mediaUrl)) {
       throw new AppError('Sender, receiver, and message content/attachment are required.', 400);
     }
     return await messageRepo.createMessage({senderId, receiverId, content: trimmedContent, type, mediaUrl});
