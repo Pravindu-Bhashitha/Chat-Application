@@ -5,7 +5,7 @@ import { AppError } from '../../utils/AppError';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
-// 1. Tell Jest to mock these modules
+// 1. mock modules
 jest.mock('../../repository/auth.repository');
 jest.mock('bcryptjs');
 jest.mock('jsonwebtoken');
@@ -28,7 +28,7 @@ describe('Auth Service', () => {
     };
 
     it('should register a new user successfully', async () => {
-      // 🟢 Uses mockedAuthRepo & mockedBcrypt with proper type inference
+      // mockedAuthRepo & mockedBcrypt with proper type inference
       mockedAuthRepo.findUserByEmail.mockResolvedValue(null);
       mockedAuthRepo.findUserByUsername.mockResolvedValue(null);
 

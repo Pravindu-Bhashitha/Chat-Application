@@ -31,7 +31,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  // 1. Initial Authentication & User Hydration
+  // 1. Initial Authentication
   useEffect(() => {
     const token = localStorage.getItem('token');
     const savedUser = localStorage.getItem('user');
@@ -44,7 +44,7 @@ const Dashboard = () => {
     setCurrentUser(JSON.parse(savedUser));
   }, [navigate]);
 
-  // 2. Load User Directory & Recent Conversations in Parallel (Single Batch Load)
+  // 2. Load User Directory & Recent Conversations in Parallel
   useEffect(() => {
     if (!currentUser?.id) return;
 
@@ -96,7 +96,6 @@ const Dashboard = () => {
     const fetchChatHistory = async () => {
       try {
         const history = await messageService.getConversation(selectedUser.id);
-        console.log('Fetched chat history:', history);
         if (history) {
           setMessages(history);
         }
@@ -195,13 +194,13 @@ const Dashboard = () => {
     if (!selectedUser || !socket) return;
 
     try {
-      // 1. Upload to backend storage
+      // 1. Upload to storage
       const uploadRes = await messageService.uploadMedia(file);
 
       // 2. Emit over Socket.io
       socket.emit('send_message', {
         receiverId: selectedUser.id,
-        content: file.name, // Display filename as content
+        content: file.name, 
         type: uploadRes.type,
         mediaUrl: uploadRes.mediaUrl,
       });

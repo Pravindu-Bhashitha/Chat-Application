@@ -122,17 +122,6 @@ const ChatArea = ({
                                     }}
                                 >
                                     {/* Render Media */}
-                                    {/* {isImage && msg.mediaUrl && (
-                                        <div className="mb-2">
-                                            <img
-                                                src={msg.mediaUrl}
-                                                alt={msg.content || 'Attached Image'}
-                                                className="img-fluid rounded border"
-                                                style={{ maxHeight: '250px', objectFit: 'cover', cursor: 'pointer' }}
-                                                onClick={() => window.open(msg.mediaUrl, '_blank')}
-                                            />
-                                        </div>
-                                    )} */}
                                     {isImage && msg.mediaUrl && (
                                         <div className="mb-2">
                                             <img
@@ -150,20 +139,6 @@ const ChatArea = ({
                                             />
                                         </div>
                                     )}
-
-                                    {/* {isFile && msg.mediaUrl && (
-                                        <div className="mb-2">
-                                            <a
-                                                href={msg.mediaUrl}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className={`d-flex align-items-center gap-2 p-2 rounded text-decoration-none ${isMe ? 'bg-white text-primary' : 'bg-light text-dark border'
-                                                    }`}
-                                            >
-                                                📎 <span className="fw-semibold text-truncate">{msg.content || 'Download Attachment'}</span>
-                                            </a>
-                                        </div>
-                                    )} */}
                                     {isFile && msg.mediaUrl && (
                                         <div className="mb-2">
                                             <a

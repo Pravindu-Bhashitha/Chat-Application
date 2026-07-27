@@ -23,7 +23,7 @@ vi.mock('../../../api/messageService/messageService', () => ({
   },
 }));
 
-// Replace your existing SocketContext & AuthContext mocks with this:
+// Replace SocketContext & AuthContext with mocks:
 vi.mock('../../../context/SocketContext', () => ({
   useSocket: vi.fn(),
 }));
@@ -41,7 +41,7 @@ vi.mock('react-router-dom', async () => {
   };
 });
 
-// Mock child components to isolate Dashboard unit logic
+// Mock child components 
 vi.mock('../../../components/UserList/UserList', () => ({
   default: ({ users, onSelectUser }: any) => (
     <div data-testid="user-list">

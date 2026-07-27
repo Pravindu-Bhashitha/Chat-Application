@@ -9,7 +9,7 @@ vi.mock('../../context/AuthContext', () => ({
   useAuth: vi.fn(),
 }));
 
-// Mock the Loading component so tests run fast and clean
+// Mock the Loading component 
 vi.mock('../../components/Loading/Loading', () => ({
   default: ({ message }: { message?: string }) => <div data-testid="loading-spinner">{message}</div>,
 }));

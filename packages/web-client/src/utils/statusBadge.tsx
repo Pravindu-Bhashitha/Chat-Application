@@ -7,6 +7,6 @@ export const getStatusBadge = (currentStatus: string|undefined) => {
       case 'Busy':
         return <span className="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill ms-2" style={{ fontSize: '0.6rem' }}>Busy</span>;
       default:
-        return null; // Don't show a badge if Offline
+        return null; 
     }
   };

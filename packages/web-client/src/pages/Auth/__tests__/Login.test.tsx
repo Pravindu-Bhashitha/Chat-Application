@@ -4,7 +4,6 @@ import { MemoryRouter } from 'react-router-dom';
 import Login from '../Login';
 import { authService } from '../../../api/authService/authService';
 import { useAuth } from '../../../context/AuthContext';
-// import { useAuth } from '../../../context/AuthContext';
 
 // Mock authService
 vi.mock('../../../api/authService/authService', () => ({

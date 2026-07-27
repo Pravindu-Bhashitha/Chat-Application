@@ -13,7 +13,7 @@ const attachAuthToken = (config: InternalAxiosRequestConfig) => {
   return config;
 };
 
-// 1. Auth Service Axios Instance (Port 4001)
+// 1. Auth Service (Port 4001)
 export const authApi = axios.create({
   baseURL: AUTH_SERVICE_URL,
   headers: { 'Content-Type': 'application/json' },
@@ -21,7 +21,7 @@ export const authApi = axios.create({
 
 authApi.interceptors.request.use(attachAuthToken, (error) => Promise.reject(error));
 
-// 2. Message Service Axios Instance (Port 4002)
+// 2. Message Service (Port 4002)
 export const messageApi = axios.create({
   baseURL: MESSAGE_SERVICE_URL,
   headers: { 'Content-Type': 'application/json' },
@@ -29,6 +29,7 @@ export const messageApi = axios.create({
 
 messageApi.interceptors.request.use(attachAuthToken, (error) => Promise.reject(error));
 
+// 3. User Service (Port 4003)
 export const userApi = axios.create({
   baseURL: USER_SERVICE_URL,
   headers: { 'Content-Type': 'application/json' },

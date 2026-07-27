@@ -91,7 +91,7 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
     setSocket(newSocket);
 
-    // Cleanup connection on unmount / logout
+    // Cleanup connection on logout
     return () => {
       newSocket.disconnect();
     };
@@ -116,7 +116,7 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     if (socket) {
       // 1. Tell backend explicitly so it broadcasts immediately to other browsers
       socket.emit('user_logout');
-      // 2. Safely close socket connection
+      // 2. close socket connection
       socket.disconnect();
       setSocket(null);
     }

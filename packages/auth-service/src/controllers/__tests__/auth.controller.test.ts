@@ -5,7 +5,7 @@ import authRoutes from '../../routes/auth.routes';
 import * as authService from '../../services/auth.service';
 import { AppError } from '../../utils/AppError';
 
-// Mock the auth service so HTTP handlers don't call real business logic
+// Mock the auth service 
 jest.mock('../../services/auth.service');
 const mockedAuthService = jest.mocked(authService);
 
@@ -44,7 +44,7 @@ describe('Auth Controller (HTTP Endpoints)', () => {
     it('should return 400 Bad Request if mandatory fields are missing', async () => {
       const response = await request(app)
         .post('/auth/register')
-        .send({ username: 'johndoe', email: 'john@example.com' }); // missing password
+        .send({ username: 'johndoe', email: 'john@example.com' }); 
 
       expect(response.status).toBe(400);
       expect(response.body).toEqual({

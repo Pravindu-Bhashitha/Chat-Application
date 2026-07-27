@@ -50,6 +50,6 @@ export const messageService = {
             throw new Error('Failed to upload file');
         }
 
-        return response.data; // returns { mediaUrl, type, originalName, size }
+        return response.data; 
     },
 };

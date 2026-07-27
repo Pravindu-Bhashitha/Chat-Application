@@ -20,7 +20,7 @@ export const formatTimestamp = (timestamp?: string) => {
     return "Yesterday";
   }
 
-  // Older than yesterday
+  // before yesterday
   return date.toLocaleDateString([], {
     month: "numeric",
     day: "numeric",

@@ -25,7 +25,7 @@ const Register = () => {
             setSuccess(true);
             setTimeout(() => {
                 navigate('/login');
-            }, 1500);
+            }, 1000);
         } catch (err: any) {
             setError(err.response?.data?.error || 'Registration failed.');
         } finally {

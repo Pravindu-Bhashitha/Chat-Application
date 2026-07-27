@@ -45,7 +45,3 @@ export async function loginUser(data: LoginUserData) {
     user: { id: user.id, username: user.username, email: user.email },
   };
 }
-
-// export async function getAllUsers() {
-//   return await authRepo.findAllUsers();
-// }

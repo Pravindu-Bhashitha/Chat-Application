@@ -20,9 +20,3 @@ export async function createUser(data: { username: string; email: string; passwo
     select: { id: true, username: true, email: true },
   });
 }
-
-// export async function findAllUsers() {
-//   return await prisma.user.findMany({
-//     select: { id: true, username: true, email: true },
-//   });
-// }

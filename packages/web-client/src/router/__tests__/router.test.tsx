@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
-// Mock lazy-loaded page modules so tests run fast without disk waiting
+// Mock lazy-loaded page modules
 vi.mock('../../pages/Auth/Login', () => ({
   default: () => <div>Login Page Component</div>,
 }));
