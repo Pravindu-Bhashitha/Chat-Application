@@ -36,3 +36,6 @@ lerna-debug.log*
 
 # Docker Volumes / Local Storage
 postgres_data/
+
+/uploads/*
+!/uploads/.gitkeep
