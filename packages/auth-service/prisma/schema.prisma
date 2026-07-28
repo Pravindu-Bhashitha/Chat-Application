@@ -1,0 +1,41 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum MessageType {
+  TEXT
+  IMAGE
+  FILE
+  AUDIO
+}
+
+model User {
+  id        String   @id @default(uuid())
+  username  String   @unique
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt  @default(now())
+}
+
+model Message {
+  id         String   @id @default(uuid())
+  senderId   String
+  receiverId String
+  conversationId String
+  content    String
+  type     MessageType @default(TEXT)
+  mediaUrl String?
+  isRead         Boolean  @default(false)
+  readAt         DateTime?             
+  createdAt  DateTime @default(now())
+  updatedAt DateTime @updatedAt @default(now()) //I can add message edit feature in future
+
+  @@index([conversationId, createdAt])
+  @@index([receiverId, isRead])
+}
