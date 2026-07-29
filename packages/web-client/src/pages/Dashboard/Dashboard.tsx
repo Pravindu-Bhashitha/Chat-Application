@@ -238,18 +238,31 @@ const Dashboard = () => {
   };
 
   return (
+    <div
+      className="d-flex flex-column vh-100"
+      style={{
+        background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+        fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
+      }}
+    >
+      <Header
+        username={currentUser?.username}
+        email={currentUser?.email}
+        onLogout={handleLogout}
+        onUpdateUser={handleUpdateUser}
+      />
 
-    <div className="d-flex flex-column vh-100 bg-light">
-      <Header username={currentUser?.username} email={currentUser?.email} onLogout={handleLogout} onUpdateUser={handleUpdateUser} />
-      <Container fluid className="flex-grow-1 d-flex flex-column pb-3 overflow-hidden">
-        <Row className="flex-grow-1 g-0 shadow-sm rounded border bg-white overflow-hidden">
+      <Container fluid className="flex-grow-1 d-flex flex-column p-2 p-md-3 overflow-hidden">
+        <Row className="flex-grow-1 g-0 rounded-4 border-0 shadow-lg overflow-hidden bg-white bg-opacity-75 backdrop-blur">
           {/* User Directory Sidebar */}
           <Col
             xs={12}
             md={4}
-            lg={3}
-            className={`d-flex flex-column h-100 border-end ${selectedUser ? 'd-none d-md-flex' : 'd-flex'
-              }`}
+            lg={3.5}
+            className={`d-flex flex-column h-100 border-end border-light-subtle ${
+              selectedUser ? 'd-none d-md-flex' : 'd-flex'
+            }`}
+            style={{ backgroundColor: 'rgba(255, 255, 255, 0.85)' }}
           >
             <UserList
               users={users}
@@ -264,13 +277,16 @@ const Dashboard = () => {
               unreadCounts={unreadCounts}
             />
           </Col>
+
           {/* Active Chat Window */}
           <Col
             xs={12}
             md={8}
-            lg={9}
-            className={`d-flex flex-column h-100 ${!selectedUser ? 'd-none d-md-flex' : 'd-flex'
-              }`}
+            lg={8.5}
+            className={`d-flex flex-column h-100 ${
+              !selectedUser ? 'd-none d-md-flex' : 'd-flex'
+            }`}
+            style={{ backgroundColor: '#ffffff' }}
           >
             <ChatArea
               selectedUser={selectedUser}
@@ -287,6 +303,7 @@ const Dashboard = () => {
           </Col>
         </Row>
       </Container>
+
       <Footer />
     </div>
   );

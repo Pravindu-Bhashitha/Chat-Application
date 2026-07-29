@@ -80,19 +80,51 @@ const Header = ({ username, email, onLogout, onUpdateUser }: HeaderProps) => {
   };
   return (
     <>
-      <Navbar bg="white" className="shadow-sm px-4 justify-content-between mb-4">
-        <Navbar.Brand className="fw-bold fs-4" style={{ color: '#0284c7' }}>
-          💬 Chat App
+      <Navbar
+        className="px-4 py-2 justify-content-between border-bottom shadow-sm"
+        style={{
+          backgroundColor: 'rgba(255, 255, 255, 0.85)',
+          backdropFilter: 'blur(12px)',
+          zIndex: 10,
+        }}
+      >
+        {/* Brand Logo */}
+        <Navbar.Brand className="d-flex align-items-center gap-2 fw-bold fs-4 m-0">
+          <div
+            className="d-flex align-items-center justify-content-center rounded-3 text-white shadow-sm"
+            style={{
+              width: 36,
+              height: 36,
+              background: 'linear-gradient(135deg, #0284c7 0%, #2563eb 100%)',
+            }}
+          >
+            💬
+          </div>
+          <span
+            style={{
+              background: 'linear-gradient(135deg, #0284c7 0%, #1e40af 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+            }}
+          >
+            PulseChat
+          </span>
         </Navbar.Brand>
+
+        {/* Right Controls */}
         <div className="d-flex align-items-center gap-3">
-          <div className="d-flex align-items-center gap-2 bg-light px-3 py-1 rounded-pill border">
+          {/* Status Dropdown Badge */}
+          <div
+            className="d-flex align-items-center gap-2 px-3 py-1 rounded-pill border bg-white shadow-sm"
+            style={{ transition: 'all 0.2s ease' }}
+          >
             <span
               style={{
-                width: 10,
-                height: 10,
+                width: 9,
+                height: 9,
                 borderRadius: '50%',
                 backgroundColor: getStatusColor(currentStatus),
-                display: 'inline-block',
+                boxShadow: `0 0 6px ${getStatusColor(currentStatus)}`,
               }}
             />
             <Form.Select
@@ -100,7 +132,7 @@ const Header = ({ username, email, onLogout, onUpdateUser }: HeaderProps) => {
               value={currentStatus}
               onChange={handleStatusChange}
               disabled={!socket?.connected}
-              className="border-0 bg-transparent shadow-none fw-semibold p-0 pe-4"
+              className="border-0 bg-transparent shadow-none fw-semibold p-0 pe-4 text-secondary"
               style={{ cursor: 'pointer', fontSize: '0.85rem' }}
             >
               <option value="Available">Available</option>
@@ -108,65 +140,99 @@ const Header = ({ username, email, onLogout, onUpdateUser }: HeaderProps) => {
               <option value="Busy">Busy</option>
             </Form.Select>
           </div>
+
+          {/* User Profile Pill */}
           {username && (
-            <span className="text-muted">
-              Logged in as{" "}
-              <strong
+            <div
+              className="d-flex align-items-center gap-2 px-3 py-1 rounded-pill bg-light border cursor-pointer hover-shadow"
+              style={{ cursor: 'pointer', transition: 'all 0.2s ease' }}
+              onClick={() => setShowModal(true)}
+            >
+              <div
+                className="rounded-circle text-white d-flex align-items-center justify-content-center fw-bold"
                 style={{
-                  color: "#0284c7",
-                  cursor: "pointer",
+                  width: 26,
+                  height: 26,
+                  backgroundColor: '#0284c7',
+                  fontSize: '0.75rem',
                 }}
-                onClick={() => setShowModal(true)}
               >
+                {username.charAt(0).toUpperCase()}
+              </div>
+              <span className="small text-secondary fw-medium me-1">
                 {username}
-              </strong>
-            </span>
+              </span>
+            </div>
           )}
-          <Button variant="outline-danger" size="sm" onClick={onLogout}>
+
+          {/* Logout Button */}
+          <Button
+            variant="light"
+            size="sm"
+            onClick={onLogout}
+            className="rounded-pill px-3 border text-danger fw-semibold shadow-none"
+            style={{ fontSize: '0.825rem' }}
+          >
             Logout
           </Button>
         </div>
       </Navbar>
-      <Modal show={showModal} onHide={() => setShowModal(false)} centered>
-        <Modal.Header closeButton>
-          <Modal.Title className="fs-5 fw-bold">Edit Profile</Modal.Title>
+
+      {/* Edit Profile Modal */}
+      <Modal
+        show={showModal}
+        onHide={() => setShowModal(false)}
+        centered
+        contentClassName="rounded-4 border-0 shadow-lg"
+      >
+        <Modal.Header closeButton className="border-0 pb-0">
+          <Modal.Title className="fs-5 fw-bold text-dark">
+            Edit Profile
+          </Modal.Title>
         </Modal.Header>
 
         <Form onSubmit={handleSaveProfile}>
-          <Modal.Body>
+          <Modal.Body className="py-3">
             {errorMsg && (
-              <div className="alert alert-danger py-2 small" role="alert">
+              <div className="alert alert-danger py-2 rounded-3 small border-0 mb-3">
                 {errorMsg}
               </div>
             )}
 
             <Form.Group className="mb-3" controlId="formUsername">
-              <Form.Label className="fw-semibold small">Username</Form.Label>
+              <Form.Label className="fw-medium text-secondary small">
+                Username
+              </Form.Label>
               <Form.Control
                 type="text"
                 name="username"
                 value={formData.username}
                 onChange={handleInputChange}
+                className="rounded-3 shadow-none border-light-subtle py-2"
                 required
               />
             </Form.Group>
 
-            <Form.Group className="mb-3" controlId="formEmail">
-              <Form.Label className="fw-semibold small">Email Address</Form.Label>
+            <Form.Group className="mb-2" controlId="formEmail">
+              <Form.Label className="fw-medium text-secondary small">
+                Email Address
+              </Form.Label>
               <Form.Control
                 type="email"
                 name="email"
                 value={formData.email}
                 onChange={handleInputChange}
+                className="rounded-3 shadow-none border-light-subtle py-2"
                 required
               />
             </Form.Group>
           </Modal.Body>
 
-          <Modal.Footer>
+          <Modal.Footer className="border-0 pt-0">
             <Button
-              variant="secondary"
+              variant="light"
               size="sm"
+              className="rounded-pill px-3 text-secondary fw-semibold"
               onClick={() => setShowModal(false)}
               disabled={isLoading}
             >
@@ -176,8 +242,11 @@ const Header = ({ username, email, onLogout, onUpdateUser }: HeaderProps) => {
               variant="primary"
               size="sm"
               type="submit"
+              className="rounded-pill px-4 fw-semibold border-0"
               disabled={isLoading}
-              style={{ backgroundColor: '#0284c7', borderColor: '#0284c7' }}
+              style={{
+                background: 'linear-gradient(135deg, #0284c7 0%, #2563eb 100%)',
+              }}
             >
               {isLoading ? 'Saving...' : 'Save Changes'}
             </Button>
