@@ -28,3 +28,34 @@ Before starting, ensure you have installed:
    ```bash
    git clone https://github.com/Pravindu-Bhashitha/Chat-Application.git
    cd Chat-Application
+
+.env for web-client
+
+VITE_AUTH_SERVICE_URL=http://localhost/api/auth
+VITE_MESSAGE_SERVICE_URL=http://localhost/api/messages
+VITE_USER_SERVICE_URL=http://localhost/api/users
+VITE_SOCKET_URL = http://localhost
+
+.env for auth-service
+
+PORT=4001
+DATABASE_URL="postgresql://postgres:123456@localhost:5432/chat_app_db?schema=public"
+JWT_SECRET="H6InPc7CQvR88AV1X4CPPXaQdQA1XCvXS9cSNrAwo9x"
+FRONTEND_URL="http://localhost:5173,http://localhost:"
+
+.env for message-service
+
+PORT=4002
+DATABASE_URL="postgresql://postgres:123456@localhost:5432/chat_app_db?schema=public"
+JWT_SECRET="H6InPc7CQvR88AV1X4CPPXaQdQA1XCvXS9cSNrAwo9x"
+CLIENT_ORIGIN="http://localhost:5173"
+CLOUDINARY_CLOUD_NAME = "qrisbpl5"
+CLOUDINARY_API_KEY = "334563368713339"
+CLOUDINARY_API_SECRET = "916LASup64kaxf-ZNgx89AZkO40"
+
+.env for user-service
+
+PORT=4003
+DATABASE_URL="postgresql://postgres:123456@localhost:5432/chat_app_db?schema=public"
+JWT_SECRET="H6InPc7CQvR88AV1X4CPPXaQdQA1XCvXS9cSNrAwo9x"
+FRONTEND_URL="http://localhost:5173"
