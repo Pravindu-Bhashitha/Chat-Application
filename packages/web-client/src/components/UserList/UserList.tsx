@@ -1,4 +1,4 @@
-import { ListGroup, Alert } from 'react-bootstrap';
+import { Alert } from 'react-bootstrap';
 import { Message, User } from '../../types';
 import UserCard from '../UserCard/UserCard';
 import Loading from '../Loading/Loading';
@@ -44,46 +44,62 @@ const UserList = ({
     const otherUsers = users.filter((u) => u.id !== currentUserId);
 
     return (
-        <div className="border-end bg-white d-flex flex-column h-100 overflow-hidden">
-            <div className="p-3 text-uppercase text-muted fw-bold small border-bottom bg-light">
-                Users Directory ({otherUsers.length > 99 ? '99+' : otherUsers.length})
-            </div>
-            <div className="flex-grow-1 overflow-auto">
-                <ListGroup variant="flush">
-                    {otherUsers.map((user) => {
-                        const isOnline = onlineUserIds.includes(user.id);
-                        const isSelected = selectedUserId === user.id;
-                        const lastMsg = lastMessages[user.id];
-                        const status = presences[user.id]?.status || 'Offline';
-                        const unreadCount = unreadCounts[user.id] || 0;
+    <div className="d-flex flex-column h-100 overflow-hidden bg-white">
+      {/* Sidebar Header */}
+      <div className="p-3 border-bottom d-flex align-items-center justify-content-between bg-white">
+        <span className="fw-bold text-dark fs-6">Messages</span>
+        <span className="badge rounded-pill bg-light text-secondary border px-2 py-1 fw-semibold">
+          {otherUsers.length}
+        </span>
+      </div>
 
-                        return (
-                            <div
-                                key={user.id}
-                                style={{
-                                    backgroundColor: isSelected ? '#f0f9ff' : 'transparent',
-                                    borderLeft: isSelected ? '4px solid #0284c7' : '4px solid transparent',
-                                    cursor: 'pointer',
-                                }}
-                            >
-                                <UserCard
-                                    username={user.username}
-                                    email={user.email}
-                                    isCurrentUser={false}
-                                    isOnline={isOnline}
-                                    lastMessage={lastMsg?.content}
-                                    timestamp={lastMsg?.timestamp || lastMsg?.timestamp}
-                                    onSelect={() => onSelectUser(user)}
-                                    status={status}
-                                    unreadCount={unreadCount}
-                                />
-                            </div>
-                        );
-                    })}
-                </ListGroup>
-            </div>
-        </div>
-    );
+      {/* Contacts List */}
+      <div className="flex-grow-1 overflow-auto py-2 custom-scrollbar">
+        {otherUsers.length === 0 ? (
+          <div className="text-center text-muted p-4 small">
+            No contacts available yet.
+          </div>
+        ) : (
+          otherUsers.map((user) => {
+            const isOnline = onlineUserIds.includes(user.id);
+            const isSelected = selectedUserId === user.id;
+            const lastMsg = lastMessages[user.id];
+            const status = presences[user.id]?.status || 'Offline';
+            const unreadCount = unreadCounts[user.id] || 0;
+
+            return (
+              <div
+                key={user.id}
+                className="mx-2 mb-1 rounded-3 transition-all"
+                style={{
+                  backgroundColor: isSelected
+                    ? '#f0f9ff'
+                    : 'transparent',
+                  borderLeft: isSelected
+                    ? '4px solid #0284c7'
+                    : '4px solid transparent',
+                  cursor: 'pointer',
+                  transition: 'background-color 0.2s ease, border-color 0.2s ease',
+                }}
+              >
+                <UserCard
+                  username={user.username}
+                  email={user.email}
+                  isCurrentUser={false}
+                  isOnline={isOnline}
+                  lastMessage={lastMsg?.content}
+                  timestamp={lastMsg?.timestamp}
+                  onSelect={() => onSelectUser(user)}
+                  status={status}
+                  unreadCount={unreadCount}
+                />
+              </div>
+            );
+          })
+        )}
+      </div>
+    </div>
+  );
 };
 
 export default UserList;
