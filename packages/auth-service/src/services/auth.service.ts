@@ -21,8 +21,7 @@ export async function registerUser(data: RegisterUserData) {
 
   const MESSAGE_SERVICE_URL = process.env.MESSAGE_SERVICE_URL || 'http://localhost:4002';
 
-  // Debug log to confirm which URL auth-service is hitting
-  console.log(`📡 Sending user creation event to: ${MESSAGE_SERVICE_URL}/api/internal/user-created`);
+  console.log(`Sending user creation event to: ${MESSAGE_SERVICE_URL}/api/internal/user-created`);
 
   fetch(`${MESSAGE_SERVICE_URL}/api/internal/user-created`, {
     method: 'POST',
