@@ -34,5 +34,5 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/packages/shared ./packages/shared
 COPY --from=builder /app/packages/user-service ./packages/user-service
 
-EXPOSE 4003
+
 CMD ["node", "packages/user-service/dist/index.js"]

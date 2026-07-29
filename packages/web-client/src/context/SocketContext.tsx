@@ -29,6 +29,7 @@ const SocketContext = createContext<SocketContextType>({
 export const useSocket = () => useContext(SocketContext);
 
 export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:4002';
   const [socket, setSocket] = useState<Socket | null>(null);
   const [onlineUserIds, setOnlineUserIds] = useState<string[]>([]);
   const [presences, setPresences] = useState<Record<string, UserPresence>>({});
@@ -47,7 +48,7 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       return;
     }
 
-    const newSocket = io('http://localhost:4002', {
+    const newSocket = io(SOCKET_URL, {
       auth: { token },
       autoConnect: true,
     });

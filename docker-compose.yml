@@ -17,8 +17,6 @@ services:
       context: .
       dockerfile: packages/auth-service/Dockerfile
     container_name: auth_service
-    ports:
-      - "4001:4001"
     environment:
       - PORT=4001
       - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?schema=public
@@ -32,8 +30,6 @@ services:
       context: .
       dockerfile: packages/user-service/Dockerfile
     container_name: user_service
-    ports:
-      - "4003:4003"
     environment:
       - PORT=4003
       - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?schema=public
@@ -47,8 +43,6 @@ services:
       context: .
       dockerfile: packages/message-service/Dockerfile
     container_name: message_service
-    ports:
-      - "4002:4002"
     environment:
       - PORT=4002
       - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?schema=public

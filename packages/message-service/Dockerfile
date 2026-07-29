@@ -34,5 +34,5 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/packages/shared ./packages/shared
 COPY --from=builder /app/packages/message-service ./packages/message-service
 
-EXPOSE 4002
+
 CMD ["node", "packages/message-service/dist/index.js"]
