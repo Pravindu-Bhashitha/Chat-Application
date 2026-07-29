@@ -62,7 +62,28 @@ const userService = {
     if (isUsernameChanged) payloadToUpdate.username = cleanUsername!;
     if (isEmailChanged) payloadToUpdate.email = cleanEmail!;
 
-    return await userRepo.updateProfile(userId, payloadToUpdate);
+    const user = await userRepo.updateProfile(userId, payloadToUpdate);
+    console.log('User profile updated:', user);
+
+    const MESSAGE_SERVICE_URL = process.env.MESSAGE_SERVICE_URL || 'http://localhost:4002';
+
+    fetch(`${MESSAGE_SERVICE_URL}/api/internal/user-updated`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        user: {
+          id: user.id,
+          username: user.username,
+          email: user.email,
+        },
+      }),
+    }).catch((err) => {
+      console.error('⚠️ Failed to notify message-service of user update:', err.message);
+    });
+
+    return user;
   },
 };
 

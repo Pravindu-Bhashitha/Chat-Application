@@ -168,12 +168,34 @@ const Dashboard = () => {
       );
     };
 
+    const handleUserCreated = (newUser: User) => {
+      if (newUser.id === currentUser.id) return;
+
+      setUsers((prevUsers) => {
+        const exists = prevUsers.some((u) => u.id === newUser.id);
+        if (exists) return prevUsers;
+        return [...prevUsers, newUser];
+      });
+    };
+
+    const handleUserUpdated = (updatedUser: Partial<User> & { id: string }) => {
+      if (updatedUser.id === currentUser.id) return;
+
+      setUsers((prevUsers) =>
+        prevUsers.map((u) => (u.id === updatedUser.id ? { ...u, ...updatedUser } : u))
+      );
+    };
+
     socket.on('receive_message', handleReceiveMessage);
     socket.on('messages_read', handleMessagesRead);
+    socket.on('user:created', handleUserCreated);
+    socket.on('user:updated', handleUserUpdated);
 
     return () => {
       socket.off('receive_message', handleReceiveMessage);
       socket.off('messages_read', handleMessagesRead);
+      socket.off('user:created', handleUserCreated);
+      socket.off('user:updated', handleUserUpdated);
     };
   }, [socket, currentUser, selectedUser]);
 
@@ -200,7 +222,7 @@ const Dashboard = () => {
       // 2. Emit over Socket.io
       socket.emit('send_message', {
         receiverId: selectedUser.id,
-        content: file.name, 
+        content: file.name,
         type: uploadRes.type,
         mediaUrl: uploadRes.mediaUrl,
       });
@@ -237,18 +259,30 @@ const Dashboard = () => {
   };
 
   return (
+    <div
+      className="d-flex flex-column vh-100"
+      style={{
+        background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+        fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
+      }}
+    >
+      <Header
+        username={currentUser?.username}
+        email={currentUser?.email}
+        onLogout={handleLogout}
+        onUpdateUser={handleUpdateUser}
+      />
 
-    <div className="d-flex flex-column vh-100 bg-light">
-      <Header username={currentUser?.username} email={currentUser?.email} onLogout={handleLogout} onUpdateUser={handleUpdateUser} />
-      <Container fluid className="flex-grow-1 d-flex flex-column pb-3 overflow-hidden">
-        <Row className="flex-grow-1 g-0 shadow-sm rounded border bg-white overflow-hidden">
+      <Container fluid className="flex-grow-1 d-flex flex-column p-2 p-md-3 overflow-hidden">
+        <Row className="flex-grow-1 g-0 rounded-4 border-0 shadow-lg overflow-hidden bg-white bg-opacity-75 backdrop-blur">
           {/* User Directory Sidebar */}
           <Col
             xs={12}
             md={4}
-            lg={3}
-            className={`d-flex flex-column h-100 border-end ${selectedUser ? 'd-none d-md-flex' : 'd-flex'
+            lg={3.5}
+            className={`d-flex flex-column h-100 border-end border-light-subtle ${selectedUser ? 'd-none d-md-flex' : 'd-flex'
               }`}
+            style={{ backgroundColor: 'rgba(255, 255, 255, 0.85)' }}
           >
             <UserList
               users={users}
@@ -263,13 +297,15 @@ const Dashboard = () => {
               unreadCounts={unreadCounts}
             />
           </Col>
+
           {/* Active Chat Window */}
           <Col
             xs={12}
             md={8}
-            lg={9}
+            lg={8.5}
             className={`d-flex flex-column h-100 ${!selectedUser ? 'd-none d-md-flex' : 'd-flex'
               }`}
+            style={{ backgroundColor: '#ffffff' }}
           >
             <ChatArea
               selectedUser={selectedUser}
@@ -286,6 +322,7 @@ const Dashboard = () => {
           </Col>
         </Row>
       </Container>
+
       <Footer />
     </div>
   );
