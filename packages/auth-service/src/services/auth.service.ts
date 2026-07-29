@@ -21,7 +21,6 @@ export async function registerUser(data: RegisterUserData) {
 
   const MESSAGE_SERVICE_URL = process.env.MESSAGE_SERVICE_URL || 'http://localhost:4002';
 
-  // Fire-and-forget native fetch call
   fetch(`${MESSAGE_SERVICE_URL}/api/internal/user-created`, {
     method: 'POST',
     headers: {
