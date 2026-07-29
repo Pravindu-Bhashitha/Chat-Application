@@ -169,12 +169,34 @@ const Dashboard = () => {
       );
     };
 
+    const handleUserCreated = (newUser: User) => {
+      if (newUser.id === currentUser.id) return;
+
+      setUsers((prevUsers) => {
+        const exists = prevUsers.some((u) => u.id === newUser.id);
+        if (exists) return prevUsers;
+        return [...prevUsers, newUser];
+      });
+    };
+
+    const handleUserUpdated = (updatedUser: Partial<User> & { id: string }) => {
+      if (updatedUser.id === currentUser.id) return;
+
+      setUsers((prevUsers) =>
+        prevUsers.map((u) => (u.id === updatedUser.id ? { ...u, ...updatedUser } : u))
+      );
+    };
+
     socket.on('receive_message', handleReceiveMessage);
     socket.on('messages_read', handleMessagesRead);
+    socket.on('user:created', handleUserCreated);
+    socket.on('user:updated', handleUserUpdated);
 
     return () => {
       socket.off('receive_message', handleReceiveMessage);
       socket.off('messages_read', handleMessagesRead);
+      socket.off('user:created', handleUserCreated);
+      socket.off('user:updated', handleUserUpdated);
     };
   }, [socket, currentUser, selectedUser]);
 
@@ -259,9 +281,8 @@ const Dashboard = () => {
             xs={12}
             md={4}
             lg={3.5}
-            className={`d-flex flex-column h-100 border-end border-light-subtle ${
-              selectedUser ? 'd-none d-md-flex' : 'd-flex'
-            }`}
+            className={`d-flex flex-column h-100 border-end border-light-subtle ${selectedUser ? 'd-none d-md-flex' : 'd-flex'
+              }`}
             style={{ backgroundColor: 'rgba(255, 255, 255, 0.85)' }}
           >
             <UserList
@@ -283,9 +304,8 @@ const Dashboard = () => {
             xs={12}
             md={8}
             lg={8.5}
-            className={`d-flex flex-column h-100 ${
-              !selectedUser ? 'd-none d-md-flex' : 'd-flex'
-            }`}
+            className={`d-flex flex-column h-100 ${!selectedUser ? 'd-none d-md-flex' : 'd-flex'
+              }`}
             style={{ backgroundColor: '#ffffff' }}
           >
             <ChatArea

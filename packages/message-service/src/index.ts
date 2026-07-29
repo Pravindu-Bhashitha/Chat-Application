@@ -4,7 +4,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import messageRoutes from './router/message.routes';
 import initSocketServer from './sockets/socketServer';
-import path from 'path';
+import { createInternalRouter } from './router/message.internal.route';
 
 dotenv.config({ override: true });
 
@@ -27,10 +27,12 @@ app.use(express.json());
 
 const server = http.createServer(app);
 
-initSocketServer(server);
-app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+// initSocketServer(server);
+const io = initSocketServer(server);
+
 // Routes
 app.use('/api/messages', messageRoutes);
+app.use('/api/internal', createInternalRouter(io));
 
 // app.listen(PORT, () => {
 //   console.log(`🚀 Message Service running on port ${PORT}`);

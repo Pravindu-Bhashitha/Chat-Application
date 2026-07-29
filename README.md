@@ -56,6 +56,7 @@ PORT=4001
 DATABASE_URL="postgresql://postgres:123456@localhost:5432/chat_app_db?schema=public"
 JWT_SECRET="H6InPc7CQvR88AV1X4CPPXaQdQA1XCvXS9cSNrAwo9x"
 FRONTEND_URL="http://localhost:5173,http://localhost:"
+MESSAGE_SERVICE_URL="http://message_service:4002"
 
 # .env for message-service
 
@@ -73,3 +74,4 @@ PORT=4003
 DATABASE_URL="postgresql://postgres:123456@localhost:5432/chat_app_db?schema=public"
 JWT_SECRET="H6InPc7CQvR88AV1X4CPPXaQdQA1XCvXS9cSNrAwo9x"
 FRONTEND_URL="http://localhost:5173"
+MESSAGE_SERVICE_URL="http://message_service:4002"

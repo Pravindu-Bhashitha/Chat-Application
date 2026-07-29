@@ -107,7 +107,7 @@ const Header = ({ username, email, onLogout, onUpdateUser }: HeaderProps) => {
               WebkitTextFillColor: 'transparent',
             }}
           >
-            PulseChat
+            Chat App
           </span>
         </Navbar.Brand>
 
