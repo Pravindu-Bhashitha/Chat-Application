@@ -29,38 +29,35 @@ Before starting, ensure you have installed:
    git clone https://github.com/Pravindu-Bhashitha/Chat-Application.git
    cd Chat-Application
 
-.env for root folder
+# .env for root folder
 
-# Database Credentials
 POSTGRES_USER=postgres
 POSTGRES_PASSWORD=123456
 POSTGRES_DB=chat_app_db
 
-# Cloudinary Credentials
 CLOUDINARY_CLOUD_NAME = "qrisbpl5"
 CLOUDINARY_API_KEY = "334563368713339"
 CLOUDINARY_API_SECRET = "916LASup64kaxf-ZNgx89AZkO40"
 
-# JWT Secret (if you use one across auth/services)
 JWT_SECRET="H6InPc7CQvR88AV1X4CPPXaQdQA1XCvXS9cSNrAwo9x"
 
 FRONTEND_URL="http://localhost,http://localhost:80,http://localhost:5173"
 
-.env for web-client
+# .env for web-client
 
 VITE_AUTH_SERVICE_URL=http://localhost/api/auth
 VITE_MESSAGE_SERVICE_URL=http://localhost/api/messages
 VITE_USER_SERVICE_URL=http://localhost/api/users
 VITE_SOCKET_URL = http://localhost
 
-.env for auth-service
+# .env for auth-service
 
 PORT=4001
 DATABASE_URL="postgresql://postgres:123456@localhost:5432/chat_app_db?schema=public"
 JWT_SECRET="H6InPc7CQvR88AV1X4CPPXaQdQA1XCvXS9cSNrAwo9x"
 FRONTEND_URL="http://localhost:5173,http://localhost:"
 
-.env for message-service
+# .env for message-service
 
 PORT=4002
 DATABASE_URL="postgresql://postgres:123456@localhost:5432/chat_app_db?schema=public"
@@ -70,7 +67,7 @@ CLOUDINARY_CLOUD_NAME = "qrisbpl5"
 CLOUDINARY_API_KEY = "334563368713339"
 CLOUDINARY_API_SECRET = "916LASup64kaxf-ZNgx89AZkO40"
 
-.env for user-service
+# .env for user-service
 
 PORT=4003
 DATABASE_URL="postgresql://postgres:123456@localhost:5432/chat_app_db?schema=public"
