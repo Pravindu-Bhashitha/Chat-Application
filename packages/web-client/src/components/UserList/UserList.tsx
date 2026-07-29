@@ -49,7 +49,7 @@ const UserList = ({
       <div className="p-3 border-bottom d-flex align-items-center justify-content-between bg-white">
         <span className="fw-bold text-dark fs-6">Messages</span>
         <span className="badge rounded-pill bg-light text-secondary border px-2 py-1 fw-semibold">
-          {otherUsers.length}
+          {otherUsers.length} user{otherUsers.length !== 1 ? 's' : ''}
         </span>
       </div>
 
