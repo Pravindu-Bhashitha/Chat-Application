@@ -43,6 +43,8 @@ JWT_SECRET="H6InPc7CQvR88AV1X4CPPXaQdQA1XCvXS9cSNrAwo9x"
 
 FRONTEND_URL="http://localhost,http://localhost:80,http://localhost:5173"
 
+MESSAGE_SERVICE_URL="http://message_service:4002"
+
 # .env for web-client
 
 VITE_AUTH_SERVICE_URL=http://localhost/api/auth
