@@ -28,50 +28,67 @@ Before starting, ensure you have installed:
    ```bash
    git clone https://github.com/Pravindu-Bhashitha/Chat-Application.git
    cd Chat-Application
+   npm install
+   ```
 
-# .env for root folder
+2. Create a `.env` file in each location below. Replace the `<placeholder>` values with your own — **never commit real secrets**; `.env` files are git-ignored.
 
+**Root folder** (`.env`)
+```env
 POSTGRES_USER=postgres
-POSTGRES_PASSWORD=123456
+POSTGRES_PASSWORD=<your_db_password>
 POSTGRES_DB=chat_app_db
 
-CLOUDINARY_CLOUD_NAME = "qrisbpl5"
-CLOUDINARY_API_KEY = "334563368713339"
-CLOUDINARY_API_SECRET = "916LASup64kaxf-ZNgx89AZkO40"
+CLOUDINARY_CLOUD_NAME=<your_cloudinary_cloud_name>
+CLOUDINARY_API_KEY=<your_cloudinary_api_key>
+CLOUDINARY_API_SECRET=<your_cloudinary_api_secret>
 
-JWT_SECRET="H6InPc7CQvR88AV1X4CPPXaQdQA1XCvXS9cSNrAwo9x"
+JWT_SECRET=<a_long_random_string>
 
 FRONTEND_URL="http://localhost,http://localhost:80,http://localhost:5173"
+```
 
-# .env for web-client
-
+**`packages/web-client/.env`**
+```env
 VITE_AUTH_SERVICE_URL=http://localhost:4001/api/auth
 VITE_MESSAGE_SERVICE_URL=http://localhost:4002/api/messages
 VITE_USER_SERVICE_URL=http://localhost:4003/api/users
-VITE_SOCKET_URL = http://localhost:4002
+VITE_SOCKET_URL=http://localhost:4002
+```
 
-# .env for auth-service
-
+**`packages/auth-service/.env`**
+```env
 PORT=4001
-DATABASE_URL="postgresql://postgres:123456@localhost:5432/chat_app_db?schema=public"
-JWT_SECRET="H6InPc7CQvR88AV1X4CPPXaQdQA1XCvXS9cSNrAwo9x"
-FRONTEND_URL="http://localhost:5173,http://localhost:"
-MESSAGE_SERVICE_URL="http://localhost:4002"
-
-# .env for message-service
-
-PORT=4002
-DATABASE_URL="postgresql://postgres:123456@localhost:5432/chat_app_db?schema=public"
-JWT_SECRET="H6InPc7CQvR88AV1X4CPPXaQdQA1XCvXS9cSNrAwo9x"
-CLIENT_ORIGIN="http://localhost:5173"
-CLOUDINARY_CLOUD_NAME = "qrisbpl5"
-CLOUDINARY_API_KEY = "334563368713339"
-CLOUDINARY_API_SECRET = "916LASup64kaxf-ZNgx89AZkO40"
-
-# .env for user-service
-
-PORT=4003
-DATABASE_URL="postgresql://postgres:123456@localhost:5432/chat_app_db?schema=public"
-JWT_SECRET="H6InPc7CQvR88AV1X4CPPXaQdQA1XCvXS9cSNrAwo9x"
+DATABASE_URL="postgresql://postgres:<your_db_password>@localhost:5432/chat_app_db?schema=public"
+JWT_SECRET=<same_jwt_secret_as_above>
 FRONTEND_URL="http://localhost:5173"
 MESSAGE_SERVICE_URL="http://localhost:4002"
+```
+
+**`packages/message-service/.env`**
+```env
+PORT=4002
+DATABASE_URL="postgresql://postgres:<your_db_password>@localhost:5432/chat_app_db?schema=public"
+JWT_SECRET=<same_jwt_secret_as_above>
+CLIENT_ORIGIN="http://localhost:5173"
+CLOUDINARY_CLOUD_NAME=<your_cloudinary_cloud_name>
+CLOUDINARY_API_KEY=<your_cloudinary_api_key>
+CLOUDINARY_API_SECRET=<your_cloudinary_api_secret>
+```
+
+**`packages/user-service/.env`**
+```env
+PORT=4003
+DATABASE_URL="postgresql://postgres:<your_db_password>@localhost:5432/chat_app_db?schema=public"
+JWT_SECRET=<same_jwt_secret_as_above>
+FRONTEND_URL="http://localhost:5173"
+MESSAGE_SERVICE_URL="http://localhost:4002"
+```
+
+---
+
+## ☁️ Deployment
+
+* **Database:** PostgreSQL on [Neon](https://neon.tech).
+* **Backend services:** [Render](https://render.com) via the `render.yaml` Blueprint (auth, message and user services). Migrations run automatically when the message service starts.
+* **Frontend:** [Vercel](https://vercel.com) with root directory `packages/web-client` and the `VITE_*` variables pointing at the Render URLs.

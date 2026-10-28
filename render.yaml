@@ -1,0 +1,60 @@
+# Render Blueprint: deploys the three backend services from this monorepo.
+# Secrets marked `sync: false` are entered in the Render dashboard on first deploy.
+services:
+  - type: web
+    name: chat-auth-service
+    runtime: node
+    plan: free
+    buildCommand: npm ci --include=dev && npm run build -w packages/shared && npm run build -w packages/auth-service
+    startCommand: npm run start -w packages/auth-service
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: FRONTEND_URL
+        sync: false
+      - key: MESSAGE_SERVICE_URL
+        sync: false
+
+  - type: web
+    name: chat-message-service
+    runtime: node
+    plan: free
+    buildCommand: npm ci --include=dev && npm run build -w packages/shared && npm run build -w packages/message-service
+    startCommand: npm run start -w packages/message-service
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: CLIENT_ORIGIN
+        sync: false
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+
+  - type: web
+    name: chat-user-service
+    runtime: node
+    plan: free
+    buildCommand: npm ci --include=dev && npm run build -w packages/shared && npm run build -w packages/user-service
+    startCommand: npm run start -w packages/user-service
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: FRONTEND_URL
+        sync: false
+      - key: MESSAGE_SERVICE_URL
+        sync: false

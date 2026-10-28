@@ -47,7 +47,7 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       return;
     }
 
-    const newSocket = io('http://localhost:4002', {
+    const newSocket = io(import.meta.env.VITE_SOCKET_URL || 'http://localhost:4002', {
       auth: { token },
       autoConnect: true,
     });
